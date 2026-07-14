@@ -245,8 +245,9 @@ blockquote { line-height: 1.7; }
 .topTight { padding-top: 24px; }
 .narrow { max-width: 860px; }
 .searchBox { display: flex; gap: 8px; margin-top: 26px; max-width: 620px; }
-.searchBox input, .writeForm input, .writeForm textarea, .writeForm select { width: 100%; border: 1px solid var(--line); border-radius: 16px; background: rgba(255,250,241,.72); padding: 14px; color: var(--ink); font: inherit; }
-.searchBox button { border: 1px solid var(--ink); border-radius: 16px; background: var(--ink); color: var(--paper); padding: 0 18px; }
+.searchBox input, .writeForm input, .writeForm textarea, .writeForm select { width: 100%; border: 1px solid var(--line); border-radius: 16px; background: rgba(255,250,241,.72); padding: 14px; color: var(--ink); font: inherit; font-size: 16px; }
+.searchBox button { min-height: 52px; border: 1px solid var(--ink); border-radius: 16px; background: var(--ink); color: var(--paper); padding: 0 18px; }
+.searchBox button:disabled { opacity: .45; cursor: not-allowed; }
 .searchMessage { color: var(--accent-2); margin-top: 12px; }
 .spotifyResults { display: grid; gap: 28px; margin-top: 30px; }
 .spotifyResultGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }

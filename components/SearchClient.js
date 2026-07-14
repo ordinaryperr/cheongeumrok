@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 function buildWriteHref(item) {
   const params = new URLSearchParams({
@@ -41,21 +41,22 @@ function ResultCard({ item }) {
 }
 
 export default function SearchClient() {
+  const resultsRef = useRef(null);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState({ albums: [], tracks: [] });
   const [status, setStatus] = useState('idle');
   const [message, setMessage] = useState('');
 
-  async function handleSubmit(event) {
-    event.preventDefault();
+  async function runSearch() {
     const keyword = query.trim();
-    if (!keyword) return;
+    if (!keyword || status === 'loading') return;
 
     setStatus('loading');
-    setMessage('');
+    setMessage('검색 중입니다. 잠시만 기다려 주세요.');
+    setResults({ albums: [], tracks: [] });
 
     try {
-      const response = await fetch(`/api/spotify/search?q=${encodeURIComponent(keyword)}`);
+      const response = await fetch(`/api/spotify/search?q=${encodeURIComponent(keyword)}`, { cache: 'no-store' });
       const data = await response.json();
 
       if (!response.ok) {
@@ -65,28 +66,43 @@ export default function SearchClient() {
         return;
       }
 
-      setResults(data);
+      setResults({ albums: data.albums || [], tracks: data.tracks || [] });
       setStatus('done');
       setMessage('');
+      setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
     } catch {
       setStatus('error');
-      setMessage('검색 요청 중 문제가 생겼습니다.');
+      setMessage('검색 요청 중 문제가 생겼습니다. 네트워크 상태를 확인한 뒤 다시 시도해 주세요.');
       setResults({ albums: [], tracks: [] });
     }
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    await runSearch();
   }
 
   const hasResults = results.albums.length > 0 || results.tracks.length > 0;
 
   return (
     <>
-      <form className="searchBox" onSubmit={handleSubmit}>
-        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="앨범, 곡, 아티스트 검색" />
-        <button type="submit">{status === 'loading' ? '검색중' : '검색'}</button>
+      <form className="searchBox" onSubmit={handleSubmit} role="search">
+        <input
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="앨범, 곡, 아티스트 검색"
+          enterKeyHint="search"
+          autoCapitalize="none"
+          autoCorrect="off"
+          inputMode="search"
+        />
+        <button type="submit" disabled={status === 'loading' || !query.trim()}>{status === 'loading' ? '검색중' : '검색'}</button>
       </form>
       {message ? <p className="searchMessage">{message}</p> : null}
       {status === 'done' && !hasResults ? <p className="searchMessage">검색 결과가 없습니다.</p> : null}
       {hasResults ? (
-        <section className="spotifyResults">
+        <section className="spotifyResults" ref={resultsRef}>
           {results.albums.length ? (
             <div>
               <p className="eyebrow">spotify albums</p>
