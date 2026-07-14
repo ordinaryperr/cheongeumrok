@@ -9,6 +9,7 @@ export default function AppHeader() {
         <Link href="/search">검색</Link>
         <Link href="/reviews">피드</Link>
         <Link href="/news">뉴스</Link>
+        <Link href="/about">소개</Link>
         <Link href="/write">기록하기</Link>
         <Link href="/profile">내 기록</Link>
         <AuthNav />

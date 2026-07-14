@@ -1,0 +1,16 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#F5F0E8"/>
+  <circle cx="130" cy="110" r="220" fill="#B76635" fill-opacity="0.18"/>
+  <circle cx="1040" cy="560" r="260" fill="#2D4A3E" fill-opacity="0.16"/>
+  <rect x="70" y="70" width="1060" height="490" rx="44" fill="#FFFAF1" stroke="#DED2C1" stroke-width="3"/>
+  <circle cx="176" cy="184" r="72" fill="#17130F"/>
+  <circle cx="176" cy="184" r="45" fill="#F5F0E8"/>
+  <circle cx="176" cy="184" r="14" fill="#17130F"/>
+  <path d="M176 112C215.765 112 248 144.235 248 184" stroke="#B76635" stroke-width="14" stroke-linecap="round"/>
+  <path d="M104 184C104 144.235 136.235 112 176 112" stroke="#2D4A3E" stroke-width="14" stroke-linecap="round"/>
+  <text x="285" y="190" fill="#17130F" font-family="Arial, sans-serif" font-size="96" font-weight="800" letter-spacing="-6">청음록</text>
+  <text x="285" y="255" fill="#B76635" font-family="Arial, sans-serif" font-size="28" font-weight="700" letter-spacing="6">MUSIC DIARY · RATINGS · REVIEWS</text>
+  <text x="92" y="395" fill="#17130F" font-family="Arial, sans-serif" font-size="58" font-weight="800" letter-spacing="-3">들은 음악을 기록하고, 취향의 울타리를 넓히는 곳.</text>
+  <text x="94" y="465" fill="#746B60" font-family="Arial, sans-serif" font-size="30">앨범과 곡에 별점과 감상을 남기고 나만의 청음 기록을 쌓아보세요.</text>
+  <text x="94" y="520" fill="#2D4A3E" font-family="Arial, sans-serif" font-size="28" font-weight="700">cheongeumrok.vercel.app</text>
+</svg>

@@ -1,4 +1,5 @@
 import AppHeader from '../../components/AppHeader';
+import AdminNewsLink from '../../components/AdminNewsLink';
 import NewsCard from '../../components/NewsCard';
 import { news as mockNews } from '../../data/news';
 import { getNewsPosts, mapSupabaseNewsPost } from '../../lib/news';
@@ -16,7 +17,7 @@ export default async function NewsPage() {
         <p className="eyebrow">music news</p>
         <h1>최근 음악 소식</h1>
         <p className="lead">Pitchfork처럼 읽을거리 중심으로, 신보·씬 이야기·음악 문화 에세이를 모아봅니다.</p>
-        <div className="heroActions"><a className="secondary" href="/admin/news">뉴스 등록하기</a></div>
+        <div className="heroActions"><AdminNewsLink /></div>
       </section>
       <section className="section topTight">
         {error ? <p className="empty">Supabase 뉴스를 불러오지 못해 더미 뉴스를 보여주고 있습니다.</p> : null}

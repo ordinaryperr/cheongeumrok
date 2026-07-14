@@ -115,7 +115,15 @@ export default function ProfileClient() {
   if (status === 'signedOut') {
     return (
       <section className="section topTight narrow">
-        <p className="empty">내 기록을 보려면 먼저 로그인해야 합니다. <Link href="/login">로그인하기</Link></p>
+        <div className="emptyState">
+          <p className="eyebrow">my archive</p>
+          <h2>내 청음 기록은 로그인 후 쌓입니다.</h2>
+          <p>좋아하는 앨범과 곡을 검색하고 별점과 감상을 남기면 이곳에서 다시 볼 수 있어요.</p>
+          <div className="heroActions">
+            <Link className="primary" href="/login">로그인하기</Link>
+            <Link className="secondary" href="/search">음악 먼저 둘러보기</Link>
+          </div>
+        </div>
       </section>
     );
   }
@@ -145,7 +153,14 @@ export default function ProfileClient() {
           <div><b>{averageRating}</b><span>평균 별점</span></div>
           <div><b>0</b><span>리스트</span></div>
         </div>
-        {reviews.length ? null : <p className="empty">아직 저장된 기록이 없습니다. 검색에서 음악을 고른 뒤 첫 감상을 남겨보세요.</p>}
+        {reviews.length ? null : (
+          <div className="emptyState">
+            <p className="eyebrow">start archive</p>
+            <h2>아직 첫 기록이 없습니다.</h2>
+            <p>방금 들은 앨범이나 오래 좋아한 곡을 검색하고, 별점과 한줄평으로 청음록을 시작해보세요.</p>
+            <div className="heroActions"><Link className="primary" href="/search">첫 음악 검색하기</Link></div>
+          </div>
+        )}
         <div className="feedList">{reviews.map((review) => <EditableReviewCard key={review.id} review={review} onDeleted={handleDeleted} onUpdated={handleUpdated} />)}</div>
       </section>
     </>

@@ -78,12 +78,18 @@ export default async function Home() {
         <p className="eyebrow">music diary · ratings · reviews</p>
         <h1>익숙한 음악 너머로<br />취향의 울타리를 넓히는 곳.</h1>
         <p className="lead">
-          청음록은 좋은 노래와 음반을 함께 발견하고, 별점과 댓글로 이야기하며,
-          나만의 음악 세계를 조금씩 확장해가는 커뮤니티입니다.
+          청음록은 앨범과 곡을 검색해 별점과 감상을 남기고,
+          나만의 청음 기록을 쌓으며 취향의 울타리를 넓혀가는 음악 기록 서비스입니다.
         </p>
         <div className="heroActions">
-          <a href="/search" className="primary">음악 검색하기</a>
-          <a href="/write" className="secondary">감상 기록하기</a>
+          <a href="/search" className="primary">첫 음악 기록하기</a>
+          <a href="/reviews" className="secondary">다른 감상 둘러보기</a>
+          <a href="/about" className="secondary">청음록 소개</a>
+        </div>
+        <div className="heroFlow" aria-label="청음록 이용 흐름">
+          <div><span>01</span><b>검색</b><small>앨범과 곡을 찾습니다.</small></div>
+          <div><span>02</span><b>기록</b><small>별점과 한줄평을 남깁니다.</small></div>
+          <div><span>03</span><b>아카이브</b><small>내 취향이 프로필에 쌓입니다.</small></div>
         </div>
       </section>
 

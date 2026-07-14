@@ -1,8 +1,27 @@
 import './globals.css';
 
 export const metadata = {
-  title: '청음록 | 음악 평점과 감상 기록',
-  description: '앨범과 곡을 듣고 별점, 리뷰, 감상 기록을 남기는 음악 평점 앱',
+  metadataBase: new URL('https://cheongeumrok.vercel.app'),
+  title: {
+    default: '청음록 | 음악 평점과 감상 기록',
+    template: '%s | 청음록',
+  },
+  description: '앨범과 곡에 별점과 감상을 남기고, 나만의 청음 기록을 쌓는 음악 기록 서비스.',
+  openGraph: {
+    title: '청음록 | 음악을 듣고 기록하는 공간',
+    description: '앨범과 곡에 별점과 감상을 남기고, 다른 사람의 청음 기록으로 취향을 넓혀보세요.',
+    url: 'https://cheongeumrok.vercel.app',
+    siteName: '청음록',
+    images: [{ url: '/og-image.svg', width: 1200, height: 630, alt: '청음록 - 음악 평점과 감상 기록' }],
+    locale: 'ko_KR',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: '청음록 | 음악을 듣고 기록하는 공간',
+    description: '앨범과 곡에 별점과 감상을 남기고 나만의 청음 기록을 쌓아보세요.',
+    images: ['/og-image.svg'],
+  },
   icons: {
     icon: [{ url: '/cheongeumrok-favicon-v6.png', type: 'image/png', sizes: '64x64' }],
     shortcut: ['/cheongeumrok-favicon-v6.png'],
