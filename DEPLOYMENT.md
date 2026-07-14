@@ -13,6 +13,23 @@ npm run dev
 http://localhost:3000
 ```
 
+## 자동 배포 명령
+
+수정 후 아래 명령을 실행하면 빌드 확인, Git 커밋, GitHub push까지 한 번에 진행됩니다.
+Vercel은 GitHub push를 감지해 자동 재배포합니다.
+
+```bash
+npm run deploy -- "커밋 메시지"
+```
+
+예시:
+
+```bash
+npm run deploy -- "Update homepage copy"
+```
+
+변경사항이 없으면 커밋/푸시하지 않고 종료됩니다.
+
 ## Vercel 환경변수
 
 Vercel Project Settings > Environment Variables에 아래 값을 등록합니다.
@@ -59,6 +76,6 @@ Supabase SQL Editor에서 `supabase/schema.sql`이 적용되어 있어야 합니
 Vercel 배포 주소가 생기면 Supabase Dashboard > Authentication > URL Configuration에서 아래를 등록합니다.
 
 ```text
-Site URL: https://your-project.vercel.app
-Redirect URLs: https://your-project.vercel.app/**
+Site URL: https://cheongeumrok.vercel.app
+Redirect URLs: https://cheongeumrok.vercel.app/**
 ```
