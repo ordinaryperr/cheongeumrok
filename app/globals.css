@@ -37,6 +37,10 @@ button { font: inherit; }
   backdrop-filter: blur(14px);
 }
 .logo {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
   font-family: 'Space Grotesk', sans-serif;
   font-size: 28px;
   font-weight: 700;

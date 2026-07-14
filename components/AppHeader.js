@@ -4,7 +4,7 @@ import AuthNav from './AuthNav';
 export default function AppHeader() {
   return (
     <header className="siteHeader">
-      <Link className="logo" href="/">청음록</Link>
+      <a className="logo" href="/" aria-label="청음록 메인으로 이동">청음록</a>
       <nav>
         <Link href="/search">검색</Link>
         <Link href="/reviews">피드</Link>
