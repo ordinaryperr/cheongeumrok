@@ -76,7 +76,7 @@ export default async function Home() {
 
       <section className="hero">
         <p className="eyebrow">music diary · ratings · reviews</p>
-        <h1>익숙한 음악 너머로<br />취향의 울타리를 넓히는 곳.</h1>
+        <h1>익숙한 음악 너머로<br />취향의 울타리를<br />넓히는 곳.</h1>
         <p className="lead">
           청음록은 앨범과 곡을 검색해 별점과 감상을 남기고,
           나만의 청음 기록을 쌓으며 취향의 울타리를 넓혀가는 음악 기록 서비스입니다.
