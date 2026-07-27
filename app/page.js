@@ -10,6 +10,8 @@ import { supabase } from '../lib/supabase';
 
 export const dynamic = 'force-dynamic';
 
+const steps = ['검색', '별점', '감상 기록', '취향 발견'];
+
 const features = [
   ['#1', 'Search', 'Spotify 검색으로 앨범과 곡을 찾고 바로 기록으로 이어갑니다.'],
   ['#2', 'Remember', '별점, 한줄평, 긴 감상이 내 프로필에 누적됩니다.'],
