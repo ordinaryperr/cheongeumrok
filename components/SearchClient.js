@@ -85,7 +85,7 @@ export default function SearchClient() {
   const hasResults = results.albums.length > 0 || results.tracks.length > 0;
 
   return (
-    <>
+    <div className="searchPanel">
       <form className="searchBox" onSubmit={handleSubmit} role="search">
         <input
           type="search"
@@ -117,6 +117,6 @@ export default function SearchClient() {
           ) : null}
         </section>
       ) : null}
-    </>
+    </div>
   );
 }
