@@ -10,7 +10,14 @@ import { supabase } from '../lib/supabase';
 
 export const dynamic = 'force-dynamic';
 
-const steps = ['검색', '별점', '감상 기록', '취향 발견'];
+const features = [
+  ['#1', 'Search', 'Spotify 검색으로 앨범과 곡을 찾고 바로 기록으로 이어갑니다.'],
+  ['#2', 'Remember', '별점, 한줄평, 긴 감상이 내 프로필에 누적됩니다.'],
+  ['#3', 'Feed', '다른 리스너의 리뷰를 보며 음악을 새롭게 발견합니다.'],
+  ['#4', 'Archive', '내 울타리 밖의 좋은 음악을 아카이브로 확장합니다.'],
+  ['#5', 'News', '신보와 음악 문화 소식을 편집된 카드로 모읍니다.'],
+  ['#6', 'Discuss', '앨범 상세에서 댓글과 감상으로 대화를 이어갑니다.'],
+];
 
 function formatTime(value) {
   if (!value) return '';
@@ -71,25 +78,50 @@ export default async function Home() {
   const news = newsData?.length ? newsData.map(mapSupabaseNewsPost) : mockNews;
 
   return (
-    <main>
+    <main className="hermesHome">
       <AppHeader />
 
-      <section className="hero">
-        <p className="eyebrow">music diary · ratings · reviews</p>
-        <h1>익숙한 음악 너머로<br />취향의 울타리를<br />넓히는 곳.</h1>
-        <p className="lead">
-          청음록은 앨범과 곡을 검색해 별점과 감상을 남기고,
-          나만의 청음 기록을 쌓으며 취향의 울타리를 넓혀가는 음악 기록 서비스입니다.
-        </p>
-        <div className="heroActions">
-          <a href="/search" className="primary">첫 음악 기록하기</a>
-          <a href="/reviews" className="secondary">다른 감상 둘러보기</a>
-          <a href="/about" className="secondary">청음록 소개</a>
+      <section className="hero hermesHero">
+        <div className="heroCopy">
+          <p className="eyebrow">open music archive · listener memory</p>
+          <h1>익숙한 음악 너머로<br />취향의 울타리를<br />넓히는 곳.</h1>
+          <p className="lead">
+            청음록은 앨범과 곡을 검색해 별점과 감상을 남기고,
+            나만의 청음 기록을 쌓으며 취향의 울타리를 넓혀가는 음악 기록 서비스입니다.
+          </p>
+          <div className="heroActions">
+            <a href="/search" className="primary">첫 음악 기록하기</a>
+            <a href="/reviews" className="secondary">다른 감상 둘러보기</a>
+            <a href="/about" className="secondary">청음록 소개</a>
+          </div>
         </div>
-        <div className="heroFlow" aria-label="청음록 이용 흐름">
-          <div><span>01</span><b>검색</b><small>앨범과 곡을 찾습니다.</small></div>
-          <div><span>02</span><b>기록</b><small>별점과 한줄평을 남깁니다.</small></div>
-          <div><span>03</span><b>아카이브</b><small>내 취향이 프로필에 쌓입니다.</small></div>
+        <aside className="hermesShowcase" aria-label="청음록 구조 미리보기">
+          <div className="showcaseTop"><span>Cheongeumrok v0.1</span><b>Live Archive</b></div>
+          <div className="showcaseDisc"><span>청</span></div>
+          <div className="showcaseCommand">search / rate / review / remember</div>
+          <div className="showcaseStats">
+            <div><b>{albums.length}</b><span>albums</span></div>
+            <div><b>{reviews.length}</b><span>reviews</span></div>
+            <div><b>{news.length}</b><span>news</span></div>
+          </div>
+        </aside>
+      </section>
+
+      <section className="section featurePreview">
+        <div className="sectionTitle centeredTitle">
+          <div>
+            <p className="eyebrow">feature preview</p>
+            <h2>하나의 기록, 여러 표면.</h2>
+          </div>
+        </div>
+        <div className="featureGrid">
+          {features.map(([number, title, description]) => (
+            <article className="featureCard" key={title}>
+              <p>{number}</p>
+              <h3>{title}</h3>
+              <span>{description}</span>
+            </article>
+          ))}
         </div>
       </section>
 
