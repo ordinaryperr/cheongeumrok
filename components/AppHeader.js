@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import AuthNav from './AuthNav';
-import ThemeToggle from './ThemeToggle';
 
 export default function AppHeader() {
   return (
@@ -13,7 +12,6 @@ export default function AppHeader() {
         <Link href="/about">소개</Link>
         <Link href="/write">기록하기</Link>
         <Link href="/profile">내 기록</Link>
-        <ThemeToggle />
         <AuthNav />
       </nav>
     </header>
