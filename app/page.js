@@ -74,6 +74,20 @@ export default async function Home() {
     <main className="homePage">
       <AppHeader />
 
+      <section className="introLanding" aria-label="청음록 인트로">
+        <div className="introOrb" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </div>
+        <div className="introCopy">
+          <p className="eyebrow">cheongeumrok archive</p>
+          <h1>청음록</h1>
+          <p>듣고, 남기고, 다시 발견하는 음악의 기록.</p>
+        </div>
+        <div className="scrollCue">scroll</div>
+      </section>
+
       <section className="hero">
         <p className="eyebrow">music diary · ratings · reviews</p>
         <h1>익숙한 음악 너머로<br />취향의 울타리를 넓히는 곳.</h1>
