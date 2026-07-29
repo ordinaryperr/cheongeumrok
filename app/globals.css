@@ -262,7 +262,6 @@ blockquote { line-height: 1.7; }
 .searchBox button:disabled { opacity: .45; cursor: not-allowed; }
 .searchMessage { color: var(--accent-2); margin-top: 12px; }
 .spotifyResults { display: grid; gap: 28px; margin-top: 30px; }
-.spotifyResults > div > .eyebrow { text-align: center; }
 .spotifyResultGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 .spotifyResultCard {
   display: grid;
