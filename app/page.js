@@ -71,7 +71,7 @@ export default async function Home() {
   const news = newsData?.length ? newsData.map(mapSupabaseNewsPost) : mockNews;
 
   return (
-    <main>
+    <main className="homePage">
       <AppHeader />
 
       <section className="hero">
