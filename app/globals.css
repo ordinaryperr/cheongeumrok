@@ -56,6 +56,7 @@ button { font: inherit; }
 }
 .logo:hover, .logo:active, .logo:focus { background: transparent; box-shadow: none; }
 nav { display: flex; align-items: center; gap: 16px; color: var(--muted); font-size: 13px; }
+.siteHeader nav { gap: 50px; }
 .headerNavLeft { justify-content: flex-end; }
 .headerNavRight { justify-content: flex-start; }
 nav button, .loginLink {
