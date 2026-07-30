@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function NewsPage() {
   const { data, error } = await getNewsPosts();
-  const news = data?.length ? data.map(mapSupabaseNewsPost) : mockNews;
+  const news = [...(data?.length ? data.map(mapSupabaseNewsPost) : []), ...mockNews];
   return (
     <main>
       <AppHeader />

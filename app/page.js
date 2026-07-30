@@ -69,7 +69,7 @@ export default async function Home() {
   ]);
   const albums = albumData?.length ? albumData.map(mapSupabaseAlbum) : mockAlbums;
   const reviews = reviewData?.length ? reviewData.slice(0, 5).map(mapSupabaseReview) : mockReviews;
-  const news = newsData?.length ? newsData.map(mapSupabaseNewsPost) : mockNews;
+  const news = [...(newsData?.length ? newsData.map(mapSupabaseNewsPost) : []), ...mockNews].slice(0, 3);
 
   return (
     <main className="homePage">
