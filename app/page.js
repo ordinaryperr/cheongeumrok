@@ -4,6 +4,7 @@ import ReviewCard from '../components/ReviewCard';
 import NewsCard from '../components/NewsCard';
 import IntroVideo from '../components/IntroVideo';
 import { albums as mockAlbums, reviews as mockReviews, goodMusicArchive } from '../data/mock';
+import { news as latestNews } from '../data/news';
 import { getNewsPosts, mapSupabaseNewsPost } from '../lib/news';
 import { getPublicReviews } from '../lib/reviews';
 import { supabase } from '../lib/supabase';
@@ -68,7 +69,7 @@ export default async function Home() {
   ]);
   const albums = albumData?.length ? albumData.map(mapSupabaseAlbum) : mockAlbums;
   const reviews = reviewData?.length ? reviewData.slice(0, 5).map(mapSupabaseReview) : mockReviews;
-  const news = newsData?.length ? newsData.map(mapSupabaseNewsPost).slice(0, 3) : [];
+  const news = [...(newsData?.length ? newsData.map(mapSupabaseNewsPost) : []), ...latestNews].slice(0, 3);
 
   return (
     <main className="homePage">

@@ -1,6 +1,7 @@
 import AppHeader from '../../components/AppHeader';
 import AdminNewsLink from '../../components/AdminNewsLink';
 import NewsCard from '../../components/NewsCard';
+import { news as latestNews } from '../../data/news';
 import { getNewsPosts, mapSupabaseNewsPost } from '../../lib/news';
 
 export const metadata = { title: '뉴스 | 청음록' };
@@ -8,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function NewsPage() {
   const { data, error } = await getNewsPosts();
-  const news = data?.length ? data.map(mapSupabaseNewsPost) : [];
+  const news = [...(data?.length ? data.map(mapSupabaseNewsPost) : []), ...latestNews];
   return (
     <main>
       <AppHeader />
