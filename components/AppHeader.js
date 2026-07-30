@@ -8,6 +8,7 @@ export default function AppHeader() {
         <Link href="/search">검색</Link>
         <Link href="/reviews">피드</Link>
         <Link href="/news">뉴스</Link>
+        <Link href="/beyond-your-fence">Beyond</Link>
         <Link href="/about">소개</Link>
       </nav>
 
