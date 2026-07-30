@@ -4,7 +4,6 @@ import ReviewCard from '../components/ReviewCard';
 import NewsCard from '../components/NewsCard';
 import IntroVideo from '../components/IntroVideo';
 import { albums as mockAlbums, reviews as mockReviews, goodMusicArchive } from '../data/mock';
-import { news as mockNews } from '../data/news';
 import { getNewsPosts, mapSupabaseNewsPost } from '../lib/news';
 import { getPublicReviews } from '../lib/reviews';
 import { supabase } from '../lib/supabase';
@@ -69,7 +68,7 @@ export default async function Home() {
   ]);
   const albums = albumData?.length ? albumData.map(mapSupabaseAlbum) : mockAlbums;
   const reviews = reviewData?.length ? reviewData.slice(0, 5).map(mapSupabaseReview) : mockReviews;
-  const news = [...(newsData?.length ? newsData.map(mapSupabaseNewsPost) : []), ...mockNews].slice(0, 3);
+  const news = newsData?.length ? newsData.map(mapSupabaseNewsPost).slice(0, 3) : [];
 
   return (
     <main className="homePage">
@@ -167,6 +166,7 @@ export default async function Home() {
           </div>
           <a className="textLink" href="/news">뉴스 더 보기 →</a>
         </div>
+        {news.length === 0 ? <p className="empty">등록된 뉴스가 없습니다.</p> : null}
         <div className="newsGrid">
           {news.map((item) => <NewsCard key={item.id} item={item} />)}
         </div>
