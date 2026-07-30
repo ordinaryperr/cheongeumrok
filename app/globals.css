@@ -196,6 +196,22 @@ h1 {
     linear-gradient(180deg, rgba(17,23,22,.18), rgba(17,23,22,.40));
   pointer-events: none;
 }
+.soundToggle {
+  position: absolute;
+  right: clamp(18px, 4vw, 54px);
+  bottom: 26px;
+  z-index: 2;
+  border: 1px solid rgba(255,255,255,.72);
+  border-radius: 999px;
+  background: rgba(17,23,22,.36);
+  color: white;
+  padding: 10px 14px;
+  font-size: 12px;
+  letter-spacing: .08em;
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+}
+.soundToggle:hover { background: rgba(255,255,255,.16); }
 .introWave {
   position: absolute;
   left: 0;

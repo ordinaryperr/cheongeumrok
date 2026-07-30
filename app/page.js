@@ -2,6 +2,7 @@ import AppHeader from '../components/AppHeader';
 import AlbumCard from '../components/AlbumCard';
 import ReviewCard from '../components/ReviewCard';
 import NewsCard from '../components/NewsCard';
+import IntroVideo from '../components/IntroVideo';
 import { albums as mockAlbums, reviews as mockReviews, goodMusicArchive } from '../data/mock';
 import { news as mockNews } from '../data/news';
 import { getNewsPosts, mapSupabaseNewsPost } from '../lib/news';
@@ -72,17 +73,7 @@ export default async function Home() {
 
   return (
     <main className="homePage">
-      <section className="introLanding videoIntro" aria-label="청음록 인트로">
-        <iframe
-          className="introVideo"
-          src="https://www.youtube.com/embed/n1h1AOeVQ38?autoplay=1&mute=1&controls=0&loop=1&playlist=n1h1AOeVQ38&playsinline=1&modestbranding=1&rel=0"
-          title="청음록 인트로 영상"
-          allow="autoplay; encrypted-media; picture-in-picture"
-          referrerPolicy="strict-origin-when-cross-origin"
-        />
-        <div className="introVideoOverlay" aria-hidden="true" />
-        <div className="scrollCue">scroll</div>
-      </section>
+      <IntroVideo />
 
       <AppHeader />
 
