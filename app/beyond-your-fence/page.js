@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function BeyondYourFencePage() {
   return (
-    <main>
+    <main className="beyondPage">
       <AppHeader />
       <section className="pageHero beyondHero">
         <p className="eyebrow">listening curriculum</p>

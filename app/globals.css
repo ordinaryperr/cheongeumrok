@@ -15,7 +15,8 @@ html {
   scroll-behavior: smooth;
   scroll-padding-top: 74px;
 }
-html:has(.homePage) {
+html:has(.homePage),
+html:has(.beyondPage) {
   scroll-snap-type: y mandatory;
 }
 body {
@@ -638,6 +639,12 @@ blockquote { line-height: 1.7; }
   .commentComposer { grid-template-columns: 1fr; }
 }
 
+.beyondPage > .pageHero,
+.beyondPage > .section,
+.beyondPage .curriculumTrack {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
 .beyondHero {
   min-height: calc(100vh - 74px);
   display: grid;
@@ -696,6 +703,9 @@ blockquote { line-height: 1.7; }
 .gradeRail small { color: var(--muted); }
 .curriculumList { display: grid; gap: 34px; }
 .curriculumTrack {
+  min-height: calc(100vh - 74px);
+  display: grid;
+  align-content: center;
   border: 1px solid var(--line);
   border-radius: 36px;
   background: rgba(255,250,241,.56);
@@ -779,5 +789,6 @@ blockquote { line-height: 1.7; }
 @media (max-width: 820px) {
   .gradeRail,
   .trackIntro { grid-template-columns: 1fr; }
-  .beyondHero { min-height: calc(100vh - 76px); }
+  .beyondHero,
+  .curriculumTrack { min-height: calc(100vh - 76px); }
 }
