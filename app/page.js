@@ -79,20 +79,20 @@ export default async function Home() {
 
       <section className="hero">
         <p className="eyebrow">music diary · ratings · reviews</p>
-        <h1>익숙한 음악 너머로<br />취향의 울타리를 넓히는 곳.</h1>
+        <h1>Beyond familiar music,<br />expand the fence of your taste.</h1>
         <p className="lead">
-          청음록은 앨범과 곡을 검색해 별점과 감상을 남기고,
-          나만의 청음 기록을 쌓으며 취향의 울타리를 넓혀가는 음악 기록 서비스입니다.
+          Cheongeumrok is a music journal for searching albums and tracks, leaving ratings and reflections,
+          and building a personal listening archive that gradually expands your taste.
         </p>
         <div className="heroActions">
-          <a href="/search" className="primary">첫 음악 기록하기</a>
-          <a href="/reviews" className="secondary">다른 감상 둘러보기</a>
-          <a href="/about" className="secondary">청음록 소개</a>
+          <a href="/search" className="primary">Start Your First Record</a>
+          <a href="/reviews" className="secondary">Explore Reviews</a>
+          <a href="/about" className="secondary">About Cheongeumrok</a>
         </div>
-        <div className="heroFlow" aria-label="청음록 이용 흐름">
-          <div><span>01</span><b>검색</b><small>앨범과 곡을 찾습니다.</small></div>
-          <div><span>02</span><b>기록</b><small>별점과 한줄평을 남깁니다.</small></div>
-          <div><span>03</span><b>아카이브</b><small>내 취향이 프로필에 쌓입니다.</small></div>
+        <div className="heroFlow" aria-label="Cheongeumrok flow">
+          <div><span>01</span><b>Search</b><small>Find albums and tracks.</small></div>
+          <div><span>02</span><b>Record</b><small>Leave ratings and short notes.</small></div>
+          <div><span>03</span><b>Archive</b><small>Your taste grows in your profile.</small></div>
         </div>
       </section>
 

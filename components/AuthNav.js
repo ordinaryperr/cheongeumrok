@@ -31,17 +31,17 @@ export default function AuthNav() {
   }
 
   if (loading) {
-    return <span className="authState">확인중</span>;
+    return <span className="authState">Checking</span>;
   }
 
   if (!user) {
-    return <Link className="loginLink" href="/login">로그인</Link>;
+    return <Link className="loginLink" href="/login">Login</Link>;
   }
 
   return (
     <div className="authNav">
       <span className="authState">{user.email}</span>
-      <button type="button" onClick={handleSignOut}>로그아웃</button>
+      <button type="button" onClick={handleSignOut}>Logout</button>
     </div>
   );
 }
