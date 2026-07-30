@@ -176,6 +176,26 @@ h1 {
   background: #111716;
   isolation: isolate;
 }
+.introVideo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100vw;
+  height: 56.25vw;
+  min-width: 177.78svh;
+  min-height: 100svh;
+  border: 0;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.introVideoOverlay {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at center, transparent 36%, rgba(17,23,22,.42) 78%),
+    linear-gradient(180deg, rgba(17,23,22,.18), rgba(17,23,22,.40));
+  pointer-events: none;
+}
 .introWave {
   position: absolute;
   left: 0;

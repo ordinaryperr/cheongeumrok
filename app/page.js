@@ -72,13 +72,15 @@ export default async function Home() {
 
   return (
     <main className="homePage">
-      <section className="introLanding" aria-label="청음록 인트로">
-        <svg className="introWave" viewBox="0 0 2400 260" preserveAspectRatio="none" aria-hidden="true">
-          <g className="introWaveTrack">
-            <path d="M0 130 C12 80 28 80 40 130 S68 180 80 130 S108 56 120 130 S148 212 160 130 S188 28 200 130 S228 232 240 130 S268 18 280 130 S308 230 320 130 S348 36 360 130 S388 208 400 130 S428 72 440 130 S468 178 480 130 S508 94 520 130 S548 166 560 130 S588 98 600 130 S628 162 640 130 S668 72 680 130 S708 208 720 130 S748 36 760 130 S788 230 800 130 S828 18 840 130 S868 232 880 130 S908 28 920 130 S948 212 960 130 S988 56 1000 130 S1028 180 1040 130 S1068 80 1080 130 S1108 166 1120 130 S1148 98 1160 130 S1188 80 1200 130" />
-            <path transform="translate(1200 0)" d="M0 130 C12 80 28 80 40 130 S68 180 80 130 S108 56 120 130 S148 212 160 130 S188 28 200 130 S228 232 240 130 S268 18 280 130 S308 230 320 130 S348 36 360 130 S388 208 400 130 S428 72 440 130 S468 178 480 130 S508 94 520 130 S548 166 560 130 S588 98 600 130 S628 162 640 130 S668 72 680 130 S708 208 720 130 S748 36 760 130 S788 230 800 130 S828 18 840 130 S868 232 880 130 S908 28 920 130 S948 212 960 130 S988 56 1000 130 S1028 180 1040 130 S1068 80 1080 130 S1108 166 1120 130 S1148 98 1160 130 S1188 80 1200 130" />
-          </g>
-        </svg>
+      <section className="introLanding videoIntro" aria-label="청음록 인트로">
+        <iframe
+          className="introVideo"
+          src="https://www.youtube.com/embed/n1h1AOeVQ38?autoplay=1&mute=1&controls=0&loop=1&playlist=n1h1AOeVQ38&playsinline=1&modestbranding=1&rel=0"
+          title="청음록 인트로 영상"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          referrerPolicy="strict-origin-when-cross-origin"
+        />
+        <div className="introVideoOverlay" aria-hidden="true" />
         <div className="scrollCue">scroll</div>
       </section>
 
