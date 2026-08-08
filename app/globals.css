@@ -673,7 +673,7 @@ blockquote { line-height: 1.7; }
 }
 .gradeRail {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 10px;
 }
 .gradeRail div {
@@ -723,7 +723,7 @@ blockquote { line-height: 1.7; }
 .trackIntro > p:not(.eyebrow) { color: var(--muted); line-height: 1.8; max-width: 620px; }
 .levelGrid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
 }
 .levelCard {

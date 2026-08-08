@@ -33,13 +33,6 @@ export const curriculumTracks = [
         albums: ['Ornette Coleman — The Shape of Jazz to Come', 'Eric Dolphy — Out to Lunch!', 'Alice Coltrane — Journey in Satchidananda'],
         requirements: ['고난도 앨범 6개 기록', '반대 취향 앨범 4개 기록', '800자 이상 리뷰 3개', '직접 큐레이션 2개 제작', '30일 이상 리스닝 로그 유지'],
       },
-      {
-        name: 'Graduate',
-        status: 'locked',
-        description: '추천받는 사람이 아니라 경로를 만드는 사람. 나만의 재즈 안내서를 완성합니다.',
-        albums: ['Sun Ra — Lanquidity', 'Pharoah Sanders — Karma', 'Mary Lou Williams — Zodiac Suite'],
-        requirements: ['입문/중급/고급 각 5개 선정', '숨은 작품 3개 발굴', '1500자 이상 리스닝 가이드 작성', '다른 리스너에게 루트 제안', '자신의 취향 변화 리포트 작성'],
-      },
     ],
   },
   {
@@ -52,7 +45,6 @@ export const curriculumTracks = [
       { name: 'Sophomore', status: 'locked', description: '배경과 감상의 경계가 흐려지는 단계.', albums: ['Stars of the Lid — And Their Refinement of the Decline', 'The KLF — Chill Out', 'Harold Budd — The Pavilion of Dreams'], requirements: ['Course Albums 8개 기록', '소리 질감 비교표 작성', '21일 이상 유지', '250자 이상 비교 감상 2개', '무드가 아닌 구조로 설명하기'] },
       { name: 'Junior', status: 'locked', description: '노이즈, 드론, 전자음의 차이를 듣습니다.', albums: ['Tim Hecker — Ravedeath, 1972', 'Fennesz — Endless Summer', 'William Basinski — The Disintegration Loops'], requirements: ['Course Albums 12개 기록', '500자 리뷰 3개', '낯선 질감 태그 7개', '인접 장르 4개', '불편했던 앨범 1개 재청취'] },
       { name: 'Senior', status: 'locked', description: '편안함을 넘어 불안과 몰입을 견디는 단계.', albums: ['La Monte Young — The Well-Tuned Piano', 'Grouper — Dragging a Dead Deer Up a Hill', 'Oneohtrix Point Never — Replica'], requirements: ['고난도 앨범 6개', '긴 호흡 감상 4개', '반대 취향 기록 3개', '큐레이션 2개', '30분 이상 단일 트랙 완청 기록'] },
-      { name: 'Graduate', status: 'locked', description: '공간 음악의 자기 언어를 만듭니다.', albums: ['Pauline Oliveros — Deep Listening', 'Éliane Radigue — Trilogie de la Mort', 'Biosphere — Substrata'], requirements: ['1500자 이상 리스닝 가이드 작성', '숨은 작품 3개 발굴', '타인에게 루트 제안', '장르 밖 연결 5개', '자신만의 listening rule 작성'] },
     ],
   },
   {
@@ -65,7 +57,6 @@ export const curriculumTracks = [
       { name: 'Sophomore', status: 'locked', description: '펑크 이후의 실험과 댄서블한 긴장을 듣습니다.', albums: ['Gang of Four — Entertainment!', 'Wire — Chairs Missing', 'Siouxsie and the Banshees — Juju'], requirements: ['Course Albums 8개', '250자 이상 비교 감상 2개', '시대 차이 기록 3개', '21일 이상 유지', '밴드별 리듬 접근 차이 설명'] },
       { name: 'Junior', status: 'locked', description: '지역과 장면의 차이가 들리기 시작합니다.', albums: ['The Fall — Hex Enduction Hour', 'This Heat — Deceit', 'Pere Ubu — Dub Housing'], requirements: ['Course Albums 12개', '500자 리뷰 3개', '인접 장르 4개 기록', '영향 관계 태그 5개', '장면/지역 차이 비교'] },
       { name: 'Senior', status: 'locked', description: '불편한 반복과 거친 질감을 통과합니다.', albums: ['Public Image Ltd — Metal Box', 'Swans — Filth', 'The Pop Group — Y'], requirements: ['고난도 앨범 6개', '반대 취향 4개', '800자 리뷰 3개', '큐레이션 2개 제작', '가장 거부감 든 앨범 재리뷰'] },
-      { name: 'Graduate', status: 'locked', description: '나만의 어두운 리스닝 루트를 설계합니다.', albums: ['Glenn Branca — The Ascension', 'Sonic Youth — EVOL', 'Xiu Xiu — Fabulous Muscles'], requirements: ['입문/중급/고급 각 5개 선정', '숨은 작품 3개 발굴', '1500자 이상 리스닝 가이드', '장르 밖 연결 5개', '다른 리스너용 과제 설계'] },
     ],
   },
 ];

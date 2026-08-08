@@ -32,7 +32,7 @@ export default function BeyondYourFencePage() {
           </div>
         </div>
         <div className="gradeRail">
-          {['Freshman', 'Sophomore', 'Junior', 'Senior', 'Graduate'].map((grade, index) => (
+          {['Freshman', 'Sophomore', 'Junior', 'Senior'].map((grade, index) => (
             <div key={grade} className={index === 0 ? 'active' : ''}>
               <span>{String(index + 1).padStart(2, '0')}</span>
               <b>{grade}</b>
