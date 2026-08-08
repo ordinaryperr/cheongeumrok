@@ -1,6 +1,6 @@
 import AppHeader from '../../components/AppHeader';
+import BeyondCurriculumClient from '../../components/BeyondCurriculumClient';
 import BeyondPersonalization from '../../components/BeyondPersonalization';
-import { curriculumTracks } from '../../data/beyondYourFence';
 
 export const metadata = {
   title: 'Beyond Your Fence',
@@ -30,7 +30,7 @@ export default function BeyondYourFencePage() {
         <div className="sectionTitle">
           <div>
             <p className="eyebrow">your curriculum</p>
-            <h2>Freshman부터 Graduate까지.</h2>
+            <h2>Freshman부터 Senior까지.</h2>
           </div>
         </div>
         <div className="gradeRail">
@@ -45,61 +45,7 @@ export default function BeyondYourFencePage() {
       </section>
 
       <section className="section topTight curriculumSection">
-        <div className="curriculumList">
-          {curriculumTracks.map((track) => (
-            <article className="curriculumTrack" key={track.id}>
-              <div className="trackIntro">
-                <p className="eyebrow">{track.signal}</p>
-                <h2>{track.genre}</h2>
-                <p>{track.reason}</p>
-              </div>
-              <div className="levelGrid">
-                {track.levels.map((level, index) => {
-                  const completed = level.status === 'open' ? 1 : 0;
-                  const total = level.requirements.length;
-                  const progress = Math.round((completed / total) * 100);
-
-                  return (
-                    <div className={`levelCard ${level.status}`} key={level.name}>
-                      <div className="levelTop">
-                        <span>{String(index + 1).padStart(2, '0')}</span>
-                        <em>{level.status === 'open' ? 'Open' : 'Locked'}</em>
-                      </div>
-                      <h3>{level.name}</h3>
-                      <p>{level.description}</p>
-
-                      <div className="semesterProgress" aria-label={`${level.name} progress`}>
-                        <div className="progressMeta">
-                          <b>{completed} / {total}</b>
-                          <span>{progress}% complete</span>
-                        </div>
-                        <div className="progressBar"><i style={{ width: `${progress}%` }} /></div>
-                      </div>
-
-                      <div className="courseAlbums">
-                        {level.albums.map((album) => <b key={album}>{album}</b>)}
-                      </div>
-                      <div className="requirements">
-                        <strong>Requirements</strong>
-                        {level.requirements.map((item, requirementIndex) => (
-                          <span className={requirementIndex < completed ? 'checked' : ''} key={item}>
-                            {requirementIndex < completed ? '☑' : '□'} {item}
-                          </span>
-                        ))}
-                      </div>
-
-                      {level.status === 'open' ? (
-                        <a className="semesterButton" href="/search">Start {level.name}</a>
-                      ) : (
-                        <div className="lockedHint">Complete {track.levels[index - 1]?.name || 'previous semester'} requirements to unlock.</div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </article>
-          ))}
-        </div>
+        <BeyondCurriculumClient />
       </section>
     </main>
   );
