@@ -52,23 +52,48 @@ export default function BeyondYourFencePage() {
                 <p>{track.reason}</p>
               </div>
               <div className="levelGrid">
-                {track.levels.map((level, index) => (
-                  <div className={`levelCard ${level.status}`} key={level.name}>
-                    <div className="levelTop">
-                      <span>{String(index + 1).padStart(2, '0')}</span>
-                      <em>{level.status === 'open' ? 'Open' : 'Locked'}</em>
+                {track.levels.map((level, index) => {
+                  const completed = level.status === 'open' ? 1 : 0;
+                  const total = level.requirements.length;
+                  const progress = Math.round((completed / total) * 100);
+
+                  return (
+                    <div className={`levelCard ${level.status}`} key={level.name}>
+                      <div className="levelTop">
+                        <span>{String(index + 1).padStart(2, '0')}</span>
+                        <em>{level.status === 'open' ? 'Open' : 'Locked'}</em>
+                      </div>
+                      <h3>{level.name}</h3>
+                      <p>{level.description}</p>
+
+                      <div className="semesterProgress" aria-label={`${level.name} progress`}>
+                        <div className="progressMeta">
+                          <b>{completed} / {total}</b>
+                          <span>{progress}% complete</span>
+                        </div>
+                        <div className="progressBar"><i style={{ width: `${progress}%` }} /></div>
+                      </div>
+
+                      <div className="courseAlbums">
+                        {level.albums.map((album) => <b key={album}>{album}</b>)}
+                      </div>
+                      <div className="requirements">
+                        <strong>Requirements</strong>
+                        {level.requirements.map((item, requirementIndex) => (
+                          <span className={requirementIndex < completed ? 'checked' : ''} key={item}>
+                            {requirementIndex < completed ? '☑' : '□'} {item}
+                          </span>
+                        ))}
+                      </div>
+
+                      {level.status === 'open' ? (
+                        <a className="semesterButton" href="/search">Start {level.name}</a>
+                      ) : (
+                        <div className="lockedHint">Complete {track.levels[index - 1]?.name || 'previous semester'} requirements to unlock.</div>
+                      )}
                     </div>
-                    <h3>{level.name}</h3>
-                    <p>{level.description}</p>
-                    <div className="courseAlbums">
-                      {level.albums.map((album) => <b key={album}>{album}</b>)}
-                    </div>
-                    <div className="requirements">
-                      <strong>Requirements</strong>
-                      {level.requirements.map((item) => <span key={item}>□ {item}</span>)}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </article>
           ))}
