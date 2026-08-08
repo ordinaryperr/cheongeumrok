@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { musicTagSchema } from '../data/musicOntology';
+import { inferMusicTags } from '../lib/taste';
 import { supabase } from '../lib/supabase';
 
 const scores = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
@@ -28,6 +30,11 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
     externalUrl: null,
     releaseDate: currentMock.year,
   };
+  const inferredTags = inferMusicTags(music);
+  const [genreTag, setGenreTag] = useState(inferredTags.genre[0] || musicTagSchema.genre[0]);
+  const [moodTag, setMoodTag] = useState(inferredTags.mood[0] === 'unclassified' ? musicTagSchema.mood[0] : inferredTags.mood[0]);
+  const [textureTag, setTextureTag] = useState(inferredTags.texture[0] === 'unclassified' ? musicTagSchema.texture[0] : inferredTags.texture[0]);
+  const [difficultyTag, setDifficultyTag] = useState('Freshman');
 
   async function upsertAlbum(item) {
     const { data, error } = await supabase
@@ -89,7 +96,20 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
     try {
       const albumId = await upsertAlbum(music);
       const trackId = music.type === 'track' ? await upsertTrack(music, albumId) : null;
-      const reviewBody = [body, recommendedTrack && `추천 트랙: ${recommendedTrack}`, expansionNote && `취향 확장 메모: ${expansionNote}`]
+      const ontologyTags = {
+        genre: genreTag,
+        mood: moodTag,
+        texture: textureTag,
+        era: inferredTags.era[0] || '',
+        difficulty: difficultyTag,
+        adjacentGenres: inferredTags.adjacentGenres,
+      };
+      const reviewBody = [
+        body,
+        `청음 태그: genre=${ontologyTags.genre}; mood=${ontologyTags.mood}; texture=${ontologyTags.texture}; era=${ontologyTags.era}; difficulty=${ontologyTags.difficulty}; adjacentGenres=${ontologyTags.adjacentGenres.join(', ')}`,
+        recommendedTrack && `추천 트랙: ${recommendedTrack}`,
+        expansionNote && `취향 확장 메모: ${expansionNote}`,
+      ]
         .filter(Boolean)
         .join('\n\n');
 
@@ -145,6 +165,28 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
           ))}
         </div>
       </label>
+      <div className="tagSelectGrid">
+        <label>Genre Signal
+          <select value={genreTag} onChange={(event) => setGenreTag(event.target.value)}>
+            {musicTagSchema.genre.map((item) => <option key={item} value={item}>{item}</option>)}
+          </select>
+        </label>
+        <label>Mood Signal
+          <select value={moodTag} onChange={(event) => setMoodTag(event.target.value)}>
+            {musicTagSchema.mood.map((item) => <option key={item} value={item}>{item}</option>)}
+          </select>
+        </label>
+        <label>Texture Signal
+          <select value={textureTag} onChange={(event) => setTextureTag(event.target.value)}>
+            {musicTagSchema.texture.map((item) => <option key={item} value={item}>{item}</option>)}
+          </select>
+        </label>
+        <label>Difficulty
+          <select value={difficultyTag} onChange={(event) => setDifficultyTag(event.target.value)}>
+            {musicTagSchema.difficulty.map((item) => <option key={item} value={item}>{item}</option>)}
+          </select>
+        </label>
+      </div>
       <label>한줄평<input value={oneLiner} onChange={(event) => setOneLiner(event.target.value)} placeholder="이 음악을 한 문장으로 남긴다면" /></label>
       <label>추천 트랙<input value={recommendedTrack} onChange={(event) => setRecommendedTrack(event.target.value)} placeholder="처음 듣는 사람에게 먼저 들려주고 싶은 곡" /></label>
       <label>감상문<textarea value={body} onChange={(event) => setBody(event.target.value)} placeholder="들으면서 떠오른 장면, 감정, 문장, 다른 장르로 이어지는 생각을 적어보세요." /></label>

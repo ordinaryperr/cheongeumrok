@@ -1,4 +1,5 @@
 import AppHeader from '../../components/AppHeader';
+import BeyondPersonalization from '../../components/BeyondPersonalization';
 import { curriculumTracks } from '../../data/beyondYourFence';
 
 export const metadata = {
@@ -25,6 +26,7 @@ export default function BeyondYourFencePage() {
       </section>
 
       <section className="section topTight beyondOverview">
+        <BeyondPersonalization />
         <div className="sectionTitle">
           <div>
             <p className="eyebrow">your curriculum</p>
