@@ -73,6 +73,26 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
     return data.id;
   }
 
+  async function upsertMusicTags({ albumId, trackId, tags }) {
+    const targetType = trackId ? 'track' : 'album';
+    const targetId = trackId || albumId;
+
+    const { error } = await supabase
+      .from('music_tags')
+      .upsert({
+        target_type: targetType,
+        target_id: targetId,
+        genre: tags.genre || null,
+        mood: tags.mood || null,
+        texture: tags.texture || null,
+        era: tags.era || null,
+        difficulty: tags.difficulty || null,
+        adjacent_genres: tags.adjacentGenres || [],
+      }, { onConflict: 'target_type,target_id' });
+
+    if (error) throw error;
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
     setStatus('saving');
@@ -126,6 +146,12 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
         });
 
       if (error) throw error;
+
+      try {
+        await upsertMusicTags({ albumId, trackId, tags: ontologyTags });
+      } catch (tagError) {
+        console.warn('music_tags 저장을 건너뜁니다:', tagError.message);
+      }
 
       setStatus('done');
       setMessage('기록이 저장되었습니다. 내 기록으로 이동합니다.');

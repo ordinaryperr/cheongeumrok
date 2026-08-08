@@ -1,6 +1,6 @@
 -- Optional normalized schema for the next ontology phase.
--- The current app stores ontology tags in review.body for compatibility.
--- Run this in Supabase SQL editor when you want normalized querying.
+-- Run this in Supabase SQL editor to store ontology tags in dedicated tables.
+-- The app still keeps tags in review.body as a compatibility fallback.
 
 create table if not exists public.music_tags (
   id uuid primary key default gen_random_uuid(),
@@ -29,10 +29,39 @@ create table if not exists public.user_taste_signals (
 alter table public.music_tags enable row level security;
 alter table public.user_taste_signals enable row level security;
 
+drop policy if exists "Public music tags are readable" on public.music_tags;
+drop policy if exists "Authenticated users can write music tags" on public.music_tags;
+drop policy if exists "Authenticated users can update music tags" on public.music_tags;
+drop policy if exists "Users can read own taste signals" on public.user_taste_signals;
+drop policy if exists "Users can write own taste signals" on public.user_taste_signals;
+drop policy if exists "Users can update own taste signals" on public.user_taste_signals;
+
 create policy "Public music tags are readable"
   on public.music_tags for select
   using (true);
 
+create policy "Authenticated users can write music tags"
+  on public.music_tags for insert
+  to authenticated
+  with check (true);
+
+create policy "Authenticated users can update music tags"
+  on public.music_tags for update
+  to authenticated
+  using (true)
+  with check (true);
+
 create policy "Users can read own taste signals"
   on public.user_taste_signals for select
   using (auth.uid() = user_id);
+
+create policy "Users can write own taste signals"
+  on public.user_taste_signals for insert
+  to authenticated
+  with check (auth.uid() = user_id);
+
+create policy "Users can update own taste signals"
+  on public.user_taste_signals for update
+  to authenticated
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
