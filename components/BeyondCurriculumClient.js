@@ -92,7 +92,12 @@ export default function BeyondCurriculumClient() {
                     </div>
 
                     <div className="courseAlbums">
-                      {level.albums.map((album) => <b key={album}>{album}</b>)}
+                      {level.albums.map((album) => (
+                        <a key={album} href={`/search?q=${encodeURIComponent(album)}`}>
+                          <b>{album}</b>
+                          <small>Search / record this assignment →</small>
+                        </a>
+                      ))}
                     </div>
                     <div className="requirements">
                       <strong>Requirements</strong>

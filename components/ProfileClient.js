@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import EditableReviewCard from './EditableReviewCard';
+import { extractTasteSignals } from '../lib/taste';
 import { supabase } from '../lib/supabase';
 
 function formatTime(value) {
@@ -104,6 +105,8 @@ export default function ProfileClient() {
     return (total / reviews.length).toFixed(1);
   }, [reviews]);
 
+  const tasteSignals = useMemo(() => extractTasteSignals(reviews), [reviews]);
+
   if (status === 'loading') {
     return (
       <section className="section topTight narrow">
@@ -151,8 +154,25 @@ export default function ProfileClient() {
         <div className="stats">
           <div><b>{reviews.length}</b><span>기록</span></div>
           <div><b>{averageRating}</b><span>평균 별점</span></div>
-          <div><b>0</b><span>리스트</span></div>
+          <div><b>{tasteSignals.primaryGenre || '—'}</b><span>주요 신호</span></div>
         </div>
+        {reviews.length ? (
+          <div className="profileTastePanel">
+            <div>
+              <p className="eyebrow">taste signals</p>
+              <h2>내 기록에서 추출한 취향 신호</h2>
+            </div>
+            <div className="tasteSignalGrid">
+              {['genre', 'mood', 'texture', 'era'].map((dimension) => (
+                <div key={dimension}>
+                  <b>{dimension}</b>
+                  {(tasteSignals.top[dimension] || []).slice(0, 4).map((item) => <span key={item.value}>{item.value} · {item.score}</span>)}
+                </div>
+              ))}
+            </div>
+            <Link className="semesterButton" href="/beyond-your-fence">Beyond Your Fence 보기</Link>
+          </div>
+        ) : null}
         {reviews.length ? null : (
           <div className="emptyState">
             <p className="eyebrow">start archive</p>

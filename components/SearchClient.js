@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 function buildWriteHref(item) {
   const params = new URLSearchParams({
@@ -47,8 +47,20 @@ export default function SearchClient() {
   const [status, setStatus] = useState('idle');
   const [message, setMessage] = useState('');
 
-  async function runSearch() {
-    const keyword = query.trim();
+  useEffect(() => {
+    const initialQuery = new URLSearchParams(window.location.search).get('q');
+    if (initialQuery) setQuery(initialQuery);
+  }, []);
+
+  useEffect(() => {
+    const initialQuery = new URLSearchParams(window.location.search).get('q');
+    if (initialQuery && query === initialQuery && status === 'idle') {
+      runSearch(initialQuery);
+    }
+  }, [query, status]);
+
+  async function runSearch(nextQuery = query) {
+    const keyword = nextQuery.trim();
     if (!keyword || status === 'loading') return;
 
     setStatus('loading');
