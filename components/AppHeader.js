@@ -11,7 +11,7 @@ export default function AppHeader() {
         <Link href="/about">About</Link>
       </nav>
 
-      <a className="logo" href="/" aria-label="청음록 메인으로 이동">청음록</a>
+      <Link className="logo" href="/" aria-label="청음록 메인으로 이동">청음록</Link>
 
       <nav className="headerNav headerNavRight" aria-label="사용자 메뉴">
         <Link href="/beyond-your-fence">Beyond</Link>

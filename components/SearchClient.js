@@ -2,6 +2,17 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+async function fetchSearchResults(keyword) {
+  const response = await fetch(`/api/spotify/search?q=${encodeURIComponent(keyword)}`, { cache: 'no-store' });
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || '검색에 실패했습니다.');
+  }
+
+  return { albums: data.albums || [], tracks: data.tracks || [] };
+}
+
 function buildWriteHref(item) {
   const params = new URLSearchParams({
     spotify: item.id,
@@ -40,24 +51,38 @@ function ResultCard({ item }) {
   );
 }
 
-export default function SearchClient() {
+export default function SearchClient({ initialQuery = '' }) {
   const resultsRef = useRef(null);
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState({ albums: [], tracks: [] });
-  const [status, setStatus] = useState('idle');
-  const [message, setMessage] = useState('');
+  const [status, setStatus] = useState(initialQuery ? 'loading' : 'idle');
+  const [message, setMessage] = useState(initialQuery ? '검색 중입니다. 잠시만 기다려 주세요.' : '');
 
   useEffect(() => {
-    const initialQuery = new URLSearchParams(window.location.search).get('q');
-    if (initialQuery) setQuery(initialQuery);
-  }, []);
+    if (!initialQuery) return;
 
-  useEffect(() => {
-    const initialQuery = new URLSearchParams(window.location.search).get('q');
-    if (initialQuery && query === initialQuery && status === 'idle') {
-      runSearch(initialQuery);
+    let cancelled = false;
+
+    async function loadInitialResults() {
+      try {
+        const nextResults = await fetchSearchResults(initialQuery);
+        if (cancelled) return;
+        setResults(nextResults);
+        setStatus('done');
+        setMessage('');
+      } catch (error) {
+        if (cancelled) return;
+        setResults({ albums: [], tracks: [] });
+        setStatus('error');
+        setMessage(error.message || '검색 요청 중 문제가 생겼습니다.');
+      }
     }
-  }, [query, status]);
+
+    loadInitialResults();
+    return () => {
+      cancelled = true;
+    };
+  }, [initialQuery]);
 
   async function runSearch(nextQuery = query) {
     const keyword = nextQuery.trim();
@@ -68,23 +93,14 @@ export default function SearchClient() {
     setResults({ albums: [], tracks: [] });
 
     try {
-      const response = await fetch(`/api/spotify/search?q=${encodeURIComponent(keyword)}`, { cache: 'no-store' });
-      const data = await response.json();
-
-      if (!response.ok) {
-        setStatus('error');
-        setMessage(data.error || '검색에 실패했습니다.');
-        setResults({ albums: [], tracks: [] });
-        return;
-      }
-
-      setResults({ albums: data.albums || [], tracks: data.tracks || [] });
+      const nextResults = await fetchSearchResults(keyword);
+      setResults(nextResults);
       setStatus('done');
       setMessage('');
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
-    } catch {
+    } catch (error) {
       setStatus('error');
-      setMessage('검색 요청 중 문제가 생겼습니다. 네트워크 상태를 확인한 뒤 다시 시도해 주세요.');
+      setMessage(error.message || '검색 요청 중 문제가 생겼습니다. 네트워크 상태를 확인한 뒤 다시 시도해 주세요.');
       setResults({ albums: [], tracks: [] });
     }
   }

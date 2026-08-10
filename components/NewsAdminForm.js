@@ -11,15 +11,11 @@ export default function NewsAdminForm() {
   const [category, setCategory] = useState('News');
   const [source, setSource] = useState('청음록 편집부');
   const [sourceUrl, setSourceUrl] = useState('');
-  const [status, setStatus] = useState('loading');
-  const [message, setMessage] = useState('');
+  const [status, setStatus] = useState(supabase ? 'loading' : 'error');
+  const [message, setMessage] = useState(supabase ? '' : 'Supabase 설정이 필요합니다.');
 
   useEffect(() => {
-    if (!supabase) {
-      setStatus('error');
-      setMessage('Supabase 설정이 필요합니다.');
-      return;
-    }
+    if (!supabase) return;
 
     supabase.auth.getUser().then(async ({ data }) => {
       const currentUser = data.user || null;
