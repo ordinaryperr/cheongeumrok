@@ -1132,3 +1132,76 @@ blockquote { line-height: 1.7; }
   background: rgba(255,255,255,.18);
   border-color: var(--line);
 }
+
+.reviewActions a {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  padding: 6px 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.socialMessage {
+  margin-top: 8px;
+  color: var(--accent-2);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.commentThread {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+.inlineComment {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255,255,255,.28);
+  padding: 10px;
+}
+.inlineComment b {
+  color: var(--accent);
+  font-family: 'Space Grotesk';
+  font-size: 12px;
+}
+.inlineComment span {
+  color: var(--muted);
+  font-size: 11px;
+}
+.inlineComment p {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  line-height: 1.55;
+}
+.inlineCommentForm {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+.inlineCommentForm input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255,250,241,.72);
+  padding: 10px 12px;
+  color: var(--ink);
+  font: inherit;
+}
+.inlineCommentForm button {
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0 12px;
+}
+
+@media (max-width: 420px) {
+  .inlineCommentForm {
+    grid-template-columns: 1fr;
+  }
+  .inlineCommentForm button {
+    min-height: 38px;
+  }
+}
