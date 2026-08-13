@@ -192,7 +192,10 @@ export default function ProfileClient() {
                 </div>
               ))}
             </div>
-            <Link className="semesterButton" href="/beyond-your-fence">Beyond Your Fence 보기</Link>
+            <div className="profileActionRow">
+              <Link className="semesterButton" href="/beyond-your-fence">Beyond Your Fence 보기</Link>
+              <Link className="semesterButton secondarySemester" href="/following">팔로잉 피드 보기</Link>
+            </div>
           </div>
         ) : null}
         {reviews.length ? null : (
