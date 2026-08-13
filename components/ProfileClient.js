@@ -35,6 +35,7 @@ function mapReview(review) {
 export default function ProfileClient() {
   const [user, setUser] = useState(null);
   const [reviews, setReviews] = useState([]);
+  const [followCounts, setFollowCounts] = useState({ followers: 0, following: 0 });
   const [status, setStatus] = useState('loading');
   const [message, setMessage] = useState('');
 
@@ -96,6 +97,12 @@ export default function ProfileClient() {
         musicTag: tagMap.get(`${review.track_id ? 'track' : 'album'}:${review.track_id || review.album_id}`) || null,
       }));
 
+      const [{ count: followers }, { count: following }] = await Promise.all([
+        supabase.from('follows').select('*', { count: 'exact', head: true }).eq('following_id', currentUser.id),
+        supabase.from('follows').select('*', { count: 'exact', head: true }).eq('follower_id', currentUser.id),
+      ]);
+
+      setFollowCounts({ followers: followers || 0, following: following || 0 });
       setReviews(enrichedReviews.map(mapReview));
       setStatus('done');
     }
@@ -168,6 +175,8 @@ export default function ProfileClient() {
           <div><b>{reviews.length}</b><span>기록</span></div>
           <div><b>{averageRating}</b><span>평균 별점</span></div>
           <div><b>{tasteSignals.primaryGenre || '—'}</b><span>주요 신호</span></div>
+          <div><b>{followCounts.followers}</b><span>팔로워</span></div>
+          <div><b>{followCounts.following}</b><span>팔로잉</span></div>
         </div>
         {reviews.length ? (
           <div className="profileTastePanel">

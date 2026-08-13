@@ -1,4 +1,5 @@
 import AppHeader from '../../../components/AppHeader';
+import FollowButton from '../../../components/FollowButton';
 import ReviewCard from '../../../components/ReviewCard';
 import { extractTasteSignals } from '../../../lib/taste';
 import { supabase } from '../../../lib/supabase';
@@ -34,7 +35,7 @@ function mapReview(review, profile) {
 async function getUserPageData(id) {
   if (!supabase) return null;
 
-  const [{ data: profile }, { data: reviews, error }] = await Promise.all([
+  const [{ data: profile }, { data: reviews, error }, { count: followerCount }, { count: followingCount }] = await Promise.all([
     supabase
       .from('profiles')
       .select('id, username, display_name, bio, avatar_url, created_at')
@@ -55,10 +56,18 @@ async function getUserPageData(id) {
       .eq('user_id', id)
       .eq('is_public', true)
       .order('created_at', { ascending: false }),
+    supabase
+      .from('follows')
+      .select('*', { count: 'exact', head: true })
+      .eq('following_id', id),
+    supabase
+      .from('follows')
+      .select('*', { count: 'exact', head: true })
+      .eq('follower_id', id),
   ]);
 
-  if (error) return { profile, reviews: [] };
-  return { profile, reviews: reviews || [] };
+  if (error) return { profile, reviews: [], followerCount: followerCount || 0, followingCount: followingCount || 0 };
+  return { profile, reviews: reviews || [], followerCount: followerCount || 0, followingCount: followingCount || 0 };
 }
 
 export async function generateMetadata({ params }) {
@@ -98,6 +107,7 @@ export default async function PublicUserPage({ params }) {
           <h1>@{profile.display_name || profile.username}</h1>
           <p className="lead">기록 {reviews.length}개 · 평균 별점 {averageRating} · 주요 신호 {taste.primaryGenre || '아직 없음'}</p>
           {profile.bio ? <p className="bodyText">{profile.bio}</p> : null}
+          <div className="heroActions"><FollowButton targetUserId={profile.id} /></div>
         </div>
       </section>
 
@@ -106,6 +116,8 @@ export default async function PublicUserPage({ params }) {
           <div><b>{reviews.length}</b><span>공개 기록</span></div>
           <div><b>{averageRating}</b><span>평균 별점</span></div>
           <div><b>{taste.primaryGenre || '—'}</b><span>주요 취향</span></div>
+          <div><b>{data.followerCount}</b><span>팔로워</span></div>
+          <div><b>{data.followingCount}</b><span>팔로잉</span></div>
         </div>
 
         {reviews.length ? (

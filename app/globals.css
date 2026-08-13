@@ -1274,3 +1274,46 @@ blockquote { line-height: 1.7; }
     grid-template-columns: 1fr;
   }
 }
+
+.followBox {
+  display: grid;
+  gap: 6px;
+}
+.followButton,
+.followSelf {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border-radius: 999px;
+  padding: 0 18px;
+  border: 1px solid var(--ink);
+  font-family: 'Space Grotesk';
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.followButton {
+  background: var(--ink);
+  color: var(--paper);
+  cursor: pointer;
+}
+.followButton.following {
+  background: transparent;
+  color: var(--ink);
+}
+.followSelf {
+  background: rgba(255,255,255,.35);
+  color: var(--muted);
+}
+.stats {
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+@media (max-width: 820px) {
+  .followBox,
+  .followButton,
+  .followSelf {
+    width: 100%;
+  }
+}
