@@ -5,6 +5,21 @@ import { curriculumTracks } from '../data/beyondYourFence';
 import { calculateLevelProgress, extractTasteSignals, normalizeMusicTagRecord, personalizeCurriculumTracks } from '../lib/taste';
 import { supabase } from '../lib/supabase';
 
+function buildAssignmentReason({ track, level, taste, status }) {
+  if (status !== 'ready' || !taste?.top) {
+    return `청음록 편집 커리큘럼 기준으로 ${track.genre}의 ${level.name} 단계에 배치된 과제입니다. 기록이 쌓이면 개인 취향 신호에 맞춰 이유가 더 구체화됩니다.`;
+  }
+
+  const genres = (taste.top.genre || []).filter((item) => item.value !== 'Unknown').slice(0, 2).map((item) => item.value);
+  const moods = (taste.top.mood || []).filter((item) => item.value !== 'unclassified').slice(0, 2).map((item) => item.value);
+  const textures = (taste.top.texture || []).filter((item) => item.value !== 'unclassified').slice(0, 2).map((item) => item.value);
+  const signals = [...moods, ...textures, ...genres].slice(0, 4);
+  const from = genres[0] || taste.primaryGenre || 'your current taste';
+  const signalText = signals.length ? signals.join(', ') : 'your recent listening pattern';
+
+  return `당신의 기록에서 ${signalText} 신호가 강하게 나타났습니다. 이 과제는 ${from}에서 ${track.genre}로 넘어가는 브리지 역할을 하며, ${level.name} 단계에 맞춰 익숙함보다 한 걸음 더 낯선 음악을 듣게 합니다.`;
+}
+
 export default function BeyondCurriculumClient() {
   const [reviews, setReviews] = useState([]);
   const [status, setStatus] = useState('loading');
@@ -99,6 +114,11 @@ export default function BeyondCurriculumClient() {
                         <span>{progress}% complete</span>
                       </div>
                       <div className="progressBar"><i style={{ width: `${progress}%` }} /></div>
+                    </div>
+
+                    <div className="assignmentReason">
+                      <strong>Why this assignment?</strong>
+                      <p>{buildAssignmentReason({ track, level, taste, status })}</p>
                     </div>
 
                     <div className="courseAlbums">

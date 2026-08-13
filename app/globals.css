@@ -1107,3 +1107,28 @@ blockquote { line-height: 1.7; }
     width: 100%;
   }
 }
+
+.assignmentReason {
+  border: 1px solid rgba(183,102,53,.28);
+  border-radius: 18px;
+  background: rgba(183,102,53,.08);
+  padding: 12px;
+  display: grid;
+  gap: 7px;
+}
+.assignmentReason strong {
+  color: var(--accent-2);
+  font-family: 'Space Grotesk';
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.assignmentReason p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+.levelCard.locked .assignmentReason {
+  background: rgba(255,255,255,.18);
+  border-color: var(--line);
+}
