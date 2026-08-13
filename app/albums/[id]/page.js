@@ -1,6 +1,7 @@
 import AppHeader from '../../../components/AppHeader';
 import ReviewCard from '../../../components/ReviewCard';
 import AlbumComments from '../../../components/AlbumComments';
+import MyAlbumRating from '../../../components/MyAlbumRating';
 import { albums as mockAlbums, reviews as mockReviews, albumComments } from '../../../data/mock';
 import { getAlbumComments, mapAlbumComment } from '../../../lib/comments';
 import { supabase } from '../../../lib/supabase';
@@ -78,6 +79,14 @@ async function getSupabaseAlbum(id) {
   };
 }
 
+function getRatingDistribution(reviews) {
+  const buckets = [5, 4, 3, 2, 1];
+  return buckets.map((score) => {
+    const count = reviews.filter((review) => Math.floor(Number(review.rating)) === score).length;
+    return { score, count };
+  });
+}
+
 function getWriteHref(album) {
   if (album.spotifyId && !album.spotifyId.startsWith('mock:')) {
     const params = new URLSearchParams({
@@ -114,6 +123,9 @@ export default async function AlbumPage({ params }) {
     ? (commentData || []).map(mapAlbumComment)
     : albumComments.filter((comment) => comment.albumId === album.id).map((comment) => ({ ...comment, body: comment.text, userId: null }));
   const ratingText = album.rating ? album.rating.toFixed(1) : '—';
+  const distribution = getRatingDistribution(albumReviews);
+  const maxDistributionCount = Math.max(...distribution.map((item) => item.count), 1);
+  const writeHref = getWriteHref(album);
 
   return (
     <main>
@@ -127,8 +139,17 @@ export default async function AlbumPage({ params }) {
           <p className="stars large">{album.rating ? '★'.repeat(Math.floor(album.rating)) : '별점 대기'}{album.rating % 1 ? '½' : ''} <span>{ratingText} · 리뷰 {album.reviews}</span></p>
           <div className="ratingPanel">
             <div><b>{ratingText}</b><span>평균 별점</span></div>
-            <div><b>—</b><span>내 별점</span></div>
-            <div><b>{comments.length}</b><span>댓글</span></div>
+            <MyAlbumRating albumId={supabaseData ? album.id : null} writeHref={writeHref} />
+            <div><b>{album.reviews}</b><span>기록한 리스너</span></div>
+          </div>
+          <div className="ratingDistribution" aria-label="별점 분포">
+            {distribution.map((item) => (
+              <div key={item.score}>
+                <span>{item.score}점</span>
+                <i><b style={{ width: `${(item.count / maxDistributionCount) * 100}%` }} /></i>
+                <em>{item.count}</em>
+              </div>
+            ))}
           </div>
           <p className="bodyText">{album.description}</p>
           <div className="tags">{album.mood.map((tag) => <span key={tag}>{tag}</span>)}</div>
@@ -136,7 +157,7 @@ export default async function AlbumPage({ params }) {
             {[0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5].map((score) => <span key={score}>{score}</span>)}
           </div>
           <div className="heroActions">
-            <a className="primary" href={getWriteHref(album)}>이 앨범 기록하기</a>
+            <a className="primary" href={writeHref}>이 앨범 기록하기</a>
             {album.externalUrl ? <a className="secondary spotifyButton" href={album.externalUrl} target="_blank" rel="noreferrer">Spotify에서 듣기</a> : null}
             <a className="secondary" href="/search">다른 음악 찾기</a>
           </div>
