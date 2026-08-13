@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import EditableReviewCard from './EditableReviewCard';
-import { extractTasteSignals } from '../lib/taste';
+import { extractTasteSignals, normalizeMusicTagRecord } from '../lib/taste';
 import { supabase } from '../lib/supabase';
 
 function formatTime(value) {
@@ -20,6 +20,7 @@ function mapReview(review) {
     rating: Number(review.rating),
     oneLiner: review.one_liner || '',
     body: review.body || '',
+    musicTag: review.musicTag || null,
     text: review.one_liner || review.body || '감상을 남겼습니다.',
     createdAt: formatTime(review.created_at),
     album: {
@@ -69,6 +70,8 @@ export default function ProfileClient() {
           one_liner,
           body,
           created_at,
+          album_id,
+          track_id,
           albums:album_id (id, title, artist, cover_url),
           tracks:track_id (id, title, artist, albums:album_id (cover_url))
         `)
@@ -83,7 +86,17 @@ export default function ProfileClient() {
         return;
       }
 
-      setReviews(data?.map(mapReview) || []);
+      const { data: tagData } = await supabase
+        .from('music_tags')
+        .select('target_type, target_id, genre, mood, texture, era, difficulty, adjacent_genres');
+
+      const tagMap = new Map((tagData || []).map((tag) => [`${tag.target_type}:${tag.target_id}`, normalizeMusicTagRecord(tag)]));
+      const enrichedReviews = (data || []).map((review) => ({
+        ...review,
+        musicTag: tagMap.get(`${review.track_id ? 'track' : 'album'}:${review.track_id || review.album_id}`) || null,
+      }));
+
+      setReviews(enrichedReviews.map(mapReview));
       setStatus('done');
     }
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { curriculumTracks } from '../data/beyondYourFence';
-import { extractTasteSignals, personalizeCurriculumTracks, scoreCurriculumTrack } from '../lib/taste';
+import { extractTasteSignals, normalizeMusicTagRecord, personalizeCurriculumTracks, scoreCurriculumTrack } from '../lib/taste';
 import { supabase } from '../lib/supabase';
 
 export default function BeyondPersonalization() {
@@ -25,7 +25,7 @@ export default function BeyondPersonalization() {
 
       const { data, error } = await supabase
         .from('reviews')
-        .select('id, rating, one_liner, body, created_at, albums(id, title, artist, release_date, album_type), tracks(id, title, artist)')
+        .select('id, rating, one_liner, body, created_at, album_id, track_id, albums:album_id(id, title, artist, release_date, album_type), tracks:track_id(id, title, artist)')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(80);
@@ -35,7 +35,17 @@ export default function BeyondPersonalization() {
         return;
       }
 
-      setReviews(data || []);
+      const { data: tagData } = await supabase
+        .from('music_tags')
+        .select('target_type, target_id, genre, mood, texture, era, difficulty, adjacent_genres');
+
+      const tagMap = new Map((tagData || []).map((tag) => [`${tag.target_type}:${tag.target_id}`, normalizeMusicTagRecord(tag)]));
+      const enrichedReviews = (data || []).map((review) => ({
+        ...review,
+        musicTag: tagMap.get(`${review.track_id ? 'track' : 'album'}:${review.track_id || review.album_id}`) || null,
+      }));
+
+      setReviews(enrichedReviews);
       setStatus('ready');
     }
 
