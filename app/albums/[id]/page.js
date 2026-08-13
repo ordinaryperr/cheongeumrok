@@ -20,7 +20,8 @@ function formatTime(value) {
 function mapSupabaseReview(review, album) {
   return {
     id: review.id,
-    user: 'listener',
+    user: review.user_id?.slice(0, 8) || 'listener',
+    userId: review.user_id || null,
     rating: Number(review.rating),
     text: review.one_liner || review.body || '감상을 남겼습니다.',
     createdAt: formatTime(review.created_at),
@@ -67,7 +68,7 @@ async function getSupabaseAlbum(id) {
 
   const { data: albumReviews, error: reviewError } = await supabase
     .from('reviews')
-    .select('id, rating, one_liner, body, created_at')
+    .select('id, user_id, rating, one_liner, body, created_at')
     .eq('album_id', id)
     .eq('is_public', true)
     .order('created_at', { ascending: false });

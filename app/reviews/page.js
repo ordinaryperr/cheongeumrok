@@ -15,7 +15,8 @@ function mapSupabaseReview(review) {
 
   return {
     id: review.id,
-    user: 'listener',
+    user: review.user_id?.slice(0, 8) || 'listener',
+    userId: review.user_id || null,
     rating: Number(review.rating),
     text: review.one_liner || review.body || '감상을 남겼습니다.',
     createdAt: formatTime(review.created_at),

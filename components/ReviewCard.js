@@ -151,7 +151,10 @@ export default function ReviewCard({ review }) {
         <span>{review.album.coverUrl ? '' : review.album.title.slice(0, 1)}</span>
       </Link>
       <div>
-        <div className="reviewMeta"><b>@{review.user}</b><span>{review.createdAt}</span></div>
+        <div className="reviewMeta">
+          {review.userId ? <Link href={`/users/${review.userId}`}><b>@{review.user}</b></Link> : <b>@{review.user}</b>}
+          <span>{review.createdAt}</span>
+        </div>
         <Link href={`/albums/${review.album.id}`}><h3>{review.album.title}</h3></Link>
         <p className="artist">{review.album.artist}</p>
         <p className="stars">{'★'.repeat(Math.floor(review.rating))}{review.rating % 1 ? '½' : ''} <span>{review.rating.toFixed(1)}</span></p>
