@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import AppHeader from '../../components/AppHeader';
 import ReviewCard from '../../components/ReviewCard';
-import { reviews as mockReviews } from '../../data/mock';
 import { getPublicReviews } from '../../lib/reviews';
 import { parseOntologyTags } from '../../lib/taste';
 import { supabase } from '../../lib/supabase';
@@ -105,9 +104,7 @@ export default async function ReviewsPage({ searchParams }) {
     ...review,
     musicTag: tagMap.get(`${review.track_id ? 'track' : 'album'}:${review.track_id || review.album_id}`) || null,
   }));
-  const mappedReviews = enrichedData.length
-    ? enrichedData.map((review) => mapSupabaseReview(review, engagementCounts.get(review.id)))
-    : mockReviews;
+  const mappedReviews = enrichedData.map((review) => mapSupabaseReview(review, engagementCounts.get(review.id)));
   const tagOptions = ['All', 'Jazz', 'Ambient', 'Post-Punk', 'R&B', 'Hip-Hop', 'Electronic', 'Freshman', 'Sophomore', 'Junior', 'Senior'];
   const reviews = sortReviews(filterReviewsByTag(mappedReviews, selectedTag), sort);
 

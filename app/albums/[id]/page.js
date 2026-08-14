@@ -2,14 +2,13 @@ import AppHeader from '../../../components/AppHeader';
 import ReviewCard from '../../../components/ReviewCard';
 import AlbumComments from '../../../components/AlbumComments';
 import MyAlbumRating from '../../../components/MyAlbumRating';
-import { albums as mockAlbums, reviews as mockReviews, albumComments } from '../../../data/mock';
 import { getAlbumComments, mapAlbumComment } from '../../../lib/comments';
 import { supabase } from '../../../lib/supabase';
 
 export const dynamic = 'force-dynamic';
 
 export function generateStaticParams() {
-  return mockAlbums.map((album) => ({ id: album.id }));
+  return [];
 }
 
 function formatTime(value) {
@@ -113,20 +112,33 @@ function getWriteHref(album) {
 export async function generateMetadata({ params }) {
   const { id } = await params;
   const supabaseData = await getSupabaseAlbum(id);
-  const album = supabaseData?.album || mockAlbums.find((item) => item.id === id) || mockAlbums[0];
-  return { title: `${album.title} - ${album.artist} | 청음록` };
+  const album = supabaseData?.album;
+  return { title: album ? `${album.title} - ${album.artist} | 청음록` : '앨범을 찾을 수 없습니다 | 청음록' };
 }
 
 export default async function AlbumPage({ params }) {
   const { id } = await params;
   const supabaseData = await getSupabaseAlbum(id);
-  const fallbackAlbum = mockAlbums.find((item) => item.id === id) || mockAlbums[0];
-  const album = supabaseData?.album || fallbackAlbum;
-  const albumReviews = supabaseData?.reviews || mockReviews.filter((review) => review.album.id === album.id);
-  const { data: commentData } = supabaseData ? await getAlbumComments(album.id) : { data: null };
-  const comments = supabaseData
-    ? (commentData || []).map(mapAlbumComment)
-    : albumComments.filter((comment) => comment.albumId === album.id).map((comment) => ({ ...comment, body: comment.text, userId: null }));
+  if (!supabaseData?.album) {
+    return (
+      <main>
+        <AppHeader />
+        <section className="section topTight narrow">
+          <div className="emptyState">
+            <p className="eyebrow">album</p>
+            <h2>앨범을 찾을 수 없습니다.</h2>
+            <p>삭제되었거나 아직 청음록에 기록되지 않은 앨범입니다. Spotify 검색으로 실제 앨범을 먼저 둘러볼 수 있습니다.</p>
+            <div className="heroActions"><a className="primary" href="/search">앨범 검색하기</a></div>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  const album = supabaseData.album;
+  const albumReviews = supabaseData.reviews;
+  const { data: commentData } = await getAlbumComments(album.id);
+  const comments = (commentData || []).map(mapAlbumComment);
   const ratingText = album.rating ? album.rating.toFixed(1) : '—';
   const distribution = getRatingDistribution(albumReviews);
   const maxDistributionCount = Math.max(...distribution.map((item) => item.count), 1);
@@ -144,7 +156,7 @@ export default async function AlbumPage({ params }) {
           <p className="stars large">{album.rating ? '★'.repeat(Math.floor(album.rating)) : '별점 대기'}{album.rating % 1 ? '½' : ''} <span>{ratingText} · 리뷰 {album.reviews}</span></p>
           <div className="ratingPanel">
             <div><b>{ratingText}</b><span>평균 별점</span></div>
-            <MyAlbumRating albumId={supabaseData ? album.id : null} writeHref={writeHref} />
+            <MyAlbumRating albumId={album.id} writeHref={writeHref} />
             <div><b>{album.reviews}</b><span>기록한 리스너</span></div>
           </div>
           <div className="ratingDistribution" aria-label="별점 분포">
@@ -179,18 +191,7 @@ export default async function AlbumPage({ params }) {
             <h2>함께 남긴 말</h2>
           </div>
         </div>
-        {supabaseData ? (
-          <AlbumComments albumId={album.id} initialComments={comments} />
-        ) : (
-          <div className="commentList">
-            {comments.length ? comments.map((comment) => (
-              <article className="commentCard" key={comment.id}>
-                <div className="reviewMeta"><b>@{comment.user}</b><span>{comment.createdAt}</span></div>
-                <p>{comment.body}</p>
-              </article>
-            )) : <p className="empty">아직 댓글이 없습니다. 첫 감상을 남겨보세요.</p>}
-          </div>
-        )}
+        <AlbumComments albumId={album.id} initialComments={comments} />
       </section>
     </main>
   );
