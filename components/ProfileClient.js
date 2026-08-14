@@ -144,6 +144,7 @@ export default function ProfileClient() {
         total: progress.total,
         progress: progress.progress,
         relatedCount: progress.relatedCount,
+        completedBadge: progress.progress >= 100,
       };
     })
       .filter((item) => item.progress > 0 || item.relatedCount > 0)
@@ -219,10 +220,17 @@ export default function ProfileClient() {
             {beyondSummary.length ? (
               <div className="profileBeyondSummary">
                 <p className="eyebrow">Beyond requirements</p>
+                {beyondSummary.some((route) => route.completedBadge) ? (
+                  <div className="beyondBadgeShelf">
+                    {beyondSummary.filter((route) => route.completedBadge).map((route) => (
+                      <span key={`badge-${route.id}`}>🏅 {route.genre} Freshman Completed</span>
+                    ))}
+                  </div>
+                ) : null}
                 {beyondSummary.map((route) => (
                   <Link href={`/beyond-your-fence?genre=${route.id}#${route.id}`} key={route.id}>
                     <b>{route.genre}</b>
-                    <span>{route.completed}/{route.total} checks · {route.progress}% Freshman</span>
+                    <span>{route.completedBadge ? 'Completed badge earned · ' : ''}{route.completed}/{route.total} checks · {route.progress}% Freshman</span>
                     <i><em style={{ width: `${route.progress}%` }} /></i>
                   </Link>
                 ))}

@@ -1,10 +1,35 @@
 import AppHeader from '../../../components/AppHeader';
 import FollowButton from '../../../components/FollowButton';
 import ReviewCard from '../../../components/ReviewCard';
-import { extractTasteSignals } from '../../../lib/taste';
+import { curriculumTracks } from '../../../data/beyondYourFence';
+import { calculateLevelProgress, extractTasteSignals, normalizeMusicTagRecord } from '../../../lib/taste';
 import { supabase } from '../../../lib/supabase';
 
 export const dynamic = 'force-dynamic';
+
+function genreParam(value = '') {
+  return String(value).toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function buildBeyondSummary(reviews) {
+  if (!reviews.length) return [];
+  return curriculumTracks.map((track) => {
+    const freshman = track.levels[0];
+    const progress = calculateLevelProgress({ track, level: freshman, reviews, previousComplete: true });
+    return {
+      id: genreParam(track.genre),
+      genre: track.genre,
+      completed: progress.completed,
+      total: progress.total,
+      progress: progress.progress,
+      relatedCount: progress.relatedCount,
+      completedBadge: progress.progress >= 100,
+    };
+  })
+    .filter((item) => item.progress > 0 || item.relatedCount > 0)
+    .sort((a, b) => b.progress - a.progress || b.relatedCount - a.relatedCount)
+    .slice(0, 4);
+}
 
 function formatTime(value) {
   if (!value) return '';
@@ -22,6 +47,7 @@ function mapReview(review, profile) {
     rating: Number(review.rating),
     text: review.one_liner || review.body || '감상을 남겼습니다.',
     body: review.body || '',
+    created_at: review.created_at,
     createdAt: formatTime(review.created_at),
     album: {
       id: target?.id || review.id,
@@ -50,6 +76,8 @@ async function getUserPageData(id) {
         one_liner,
         body,
         created_at,
+        album_id,
+        track_id,
         albums:album_id (id, title, artist, cover_url, release_date, album_type),
         tracks:track_id (id, title, artist, albums:album_id (cover_url))
       `)
@@ -67,7 +95,17 @@ async function getUserPageData(id) {
   ]);
 
   if (error) return { profile, reviews: [], followerCount: followerCount || 0, followingCount: followingCount || 0 };
-  return { profile, reviews: reviews || [], followerCount: followerCount || 0, followingCount: followingCount || 0 };
+
+  const { data: tagData } = await supabase
+    .from('music_tags')
+    .select('target_type, target_id, genre, mood, texture, era, difficulty, adjacent_genres');
+  const tagMap = new Map((tagData || []).map((tag) => [`${tag.target_type}:${tag.target_id}`, normalizeMusicTagRecord(tag)]));
+  const enrichedReviews = (reviews || []).map((review) => ({
+    ...review,
+    musicTag: tagMap.get(`${review.track_id ? 'track' : 'album'}:${review.track_id || review.album_id}`) || null,
+  }));
+
+  return { profile, reviews: enrichedReviews, followerCount: followerCount || 0, followingCount: followingCount || 0 };
 }
 
 export async function generateMetadata({ params }) {
@@ -96,6 +134,7 @@ export default async function PublicUserPage({ params }) {
     ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
     : '0.0';
   const taste = extractTasteSignals(data.reviews);
+  const beyondSummary = buildBeyondSummary(data.reviews);
 
   return (
     <main>
@@ -134,6 +173,25 @@ export default async function PublicUserPage({ params }) {
                 </div>
               ))}
             </div>
+            {beyondSummary.length ? (
+              <div className="profileBeyondSummary publicBeyondSummary">
+                <p className="eyebrow">Beyond route</p>
+                {beyondSummary.some((route) => route.completedBadge) ? (
+                  <div className="beyondBadgeShelf">
+                    {beyondSummary.filter((route) => route.completedBadge).map((route) => (
+                      <span key={`badge-${route.id}`}>🏅 {route.genre} Freshman Completed</span>
+                    ))}
+                  </div>
+                ) : null}
+                {beyondSummary.map((route) => (
+                  <a href={`/beyond-your-fence?genre=${route.id}#${route.id}`} key={route.id}>
+                    <b>{route.genre}</b>
+                    <span>{route.completedBadge ? 'Completed badge earned · ' : ''}{route.completed}/{route.total} checks · {route.progress}% Freshman</span>
+                    <i><em style={{ width: `${route.progress}%` }} /></i>
+                  </a>
+                ))}
+              </div>
+            ) : null}
           </div>
         ) : null}
 

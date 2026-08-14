@@ -130,6 +130,7 @@ export default async function ArchivePage({ searchParams }) {
                       <p className="mood">{album.year} · Spotify Album</p>
                       <h3>{album.title}</h3>
                       <p className="artist">{album.artist}</p>
+                      <p className="archiveAlbumRouteNote">이 앨범은 {collection.tags[0]} Freshman Route의 입구로 사용할 수 있습니다.</p>
                       <div className="reviewActions">
                         <Link href={album.href || `/albums/spotify/${album.id}`}>앨범 둘러보기</Link>
                         <Link href={buildWriteHref(album)}>기록하기</Link>

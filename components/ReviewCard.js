@@ -18,7 +18,7 @@ export default function ReviewCard({ review }) {
   const canInteract = useMemo(() => Boolean(supabase && isUuid(review.id)), [review.id]);
   const [user, setUser] = useState(null);
   const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
+  const [likeCount, setLikeCount] = useState(review.likeCount || 0);
   const [comments, setComments] = useState([]);
   const [commentOpen, setCommentOpen] = useState(false);
   const [commentBody, setCommentBody] = useState('');
@@ -170,7 +170,7 @@ export default function ReviewCard({ review }) {
         ) : null}
         <div className="reviewActions">
           <button type="button" onClick={handleLike} disabled={!canInteract || status === 'saving'}>{liked ? '좋아요 취소' : '좋아요'} {likeCount}</button>
-          <button type="button" onClick={() => setCommentOpen((open) => !open)} disabled={!canInteract}>댓글 {comments.length}</button>
+          <button type="button" onClick={() => setCommentOpen((open) => !open)} disabled={!canInteract}>댓글 {comments.length || review.commentCount || 0}</button>
           {canInteract ? <Link href={`/reviews/${review.id}`}>리뷰 보기</Link> : null}
           <Link href={`/albums/${review.album.id}`}>앨범 보기</Link>
         </div>

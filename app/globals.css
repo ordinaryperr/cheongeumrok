@@ -1885,3 +1885,32 @@ blockquote { line-height: 1.7; }
     grid-template-columns: 1fr;
   }
 }
+
+.beyondBadgeShelf {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0;
+}
+.beyondBadgeShelf span {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(183,102,53,.35);
+  border-radius: 999px;
+  background: rgba(183,102,53,.10);
+  padding: 6px 9px;
+  color: var(--accent-2);
+  font-family: 'Space Grotesk';
+  font-size: 11px;
+  letter-spacing: .04em;
+}
+.publicBeyondSummary {
+  margin-top: 16px;
+}
+
+.archiveAlbumRouteNote {
+  margin-top: 6px;
+  color: var(--accent-2);
+  font-size: 12px;
+  line-height: 1.45;
+}

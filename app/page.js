@@ -19,7 +19,28 @@ function formatTime(value) {
   return new Intl.DateTimeFormat('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
 }
 
-function mapSupabaseReview(review) {
+async function getEngagementCounts(reviewIds) {
+  if (!supabase || reviewIds.length === 0) return new Map();
+
+  const [likesResult, commentsResult] = await Promise.all([
+    supabase.from('review_likes').select('review_id').in('review_id', reviewIds),
+    supabase.from('review_comments').select('review_id').in('review_id', reviewIds),
+  ]);
+
+  const counts = new Map(reviewIds.map((id) => [id, { likes: 0, comments: 0 }]));
+  (likesResult.data || []).forEach((item) => {
+    const prev = counts.get(item.review_id) || { likes: 0, comments: 0 };
+    counts.set(item.review_id, { ...prev, likes: prev.likes + 1 });
+  });
+  (commentsResult.data || []).forEach((item) => {
+    const prev = counts.get(item.review_id) || { likes: 0, comments: 0 };
+    counts.set(item.review_id, { ...prev, comments: prev.comments + 1 });
+  });
+
+  return counts;
+}
+
+function mapSupabaseReview(review, engagement = {}) {
   const target = review.albums || review.tracks;
 
   return {
@@ -28,6 +49,8 @@ function mapSupabaseReview(review) {
     userId: review.user_id || null,
     rating: Number(review.rating),
     text: review.one_liner || review.body || '감상을 남겼습니다.',
+    likeCount: engagement.likes || 0,
+    commentCount: engagement.comments || 0,
     createdAt: formatTime(review.created_at),
     album: {
       id: target?.id || review.id,
@@ -72,9 +95,16 @@ export default async function Home() {
     getSpotifyArchiveCollections(),
     getSpotifyStarterAlbums(),
   ]);
+  const reviewIds = (reviewData || []).map((review) => review.id);
+  const engagementCounts = await getEngagementCounts(reviewIds);
   const hasRecordedAlbums = Boolean(albumData?.length);
   const albums = hasRecordedAlbums ? albumData.map(mapSupabaseAlbum) : starterAlbums;
-  const reviews = reviewData?.length ? reviewData.slice(0, 5).map(mapSupabaseReview) : [];
+  const mappedReviews = reviewData?.length ? reviewData.map((review) => mapSupabaseReview(review, engagementCounts.get(review.id))) : [];
+  const reviews = mappedReviews.slice(0, 5);
+  const popularReviews = [...mappedReviews]
+    .sort((a, b) => ((b.likeCount || 0) + (b.commentCount || 0)) - ((a.likeCount || 0) + (a.commentCount || 0)))
+    .filter((review) => (review.likeCount || 0) + (review.commentCount || 0) > 0)
+    .slice(0, 3);
   const editorialNews = (newsData || []).filter((post) => !isPlaceholderNewsPost(post)).map(mapSupabaseNewsPost);
   const seenNews = new Set();
   const news = [...externalNews, ...editorialNews, ...latestNews].filter((item) => {
@@ -186,6 +216,19 @@ export default async function Home() {
         {news.length === 0 ? <p className="empty">등록된 뉴스가 없습니다.</p> : null}
         <div className="newsGrid">
           {news.map((item) => <NewsCard key={item.id} item={item} />)}
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="sectionTitle">
+          <div>
+            <p className="eyebrow">popular reviews</p>
+            <h2>반응이 많은 감상</h2>
+          </div>
+          <Link className="textLink" href="/reviews?sort=likes">인기순 보기 →</Link>
+        </div>
+        <div className="feedList">
+          {popularReviews.length ? popularReviews.map((review) => <ReviewCard key={review.id} review={review} />) : <p className="empty">아직 좋아요나 댓글이 쌓인 감상이 없습니다.</p>}
         </div>
       </section>
 
