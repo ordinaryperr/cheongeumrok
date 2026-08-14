@@ -1559,3 +1559,16 @@ blockquote { line-height: 1.7; }
   background-size: cover;
   background-position: center;
 }
+
+.archiveAlbums .archiveAlbumCover.imageCover {
+  background-size: contain;
+  background-color: rgba(255,250,241,.86);
+}
+.archiveAlbums a {
+  min-height: 64px;
+  align-items: center;
+}
+.archiveAlbums b {
+  line-height: 1.18;
+  overflow-wrap: anywhere;
+}
