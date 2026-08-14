@@ -1396,3 +1396,37 @@ blockquote { line-height: 1.7; }
     grid-template-columns: 1fr 1fr;
   }
 }
+
+.sortTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.sortTabs a {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255,250,241,.50);
+  padding: 0 12px;
+  color: var(--muted);
+  font-family: 'Space Grotesk';
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.sortTabs a.active {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+@media (max-width: 420px) {
+  .sortTabs {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}

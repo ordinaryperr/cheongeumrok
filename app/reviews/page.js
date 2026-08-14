@@ -2,6 +2,7 @@ import AppHeader from '../../components/AppHeader';
 import ReviewCard from '../../components/ReviewCard';
 import { reviews as mockReviews } from '../../data/mock';
 import { getPublicReviews } from '../../lib/reviews';
+import { supabase } from '../../lib/supabase';
 
 export const metadata = { title: '리뷰 피드 | 청음록' };
 
@@ -10,7 +11,34 @@ function formatTime(value) {
   return new Intl.DateTimeFormat('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
 }
 
-function mapSupabaseReview(review) {
+async function getEngagementCounts(reviewIds) {
+  if (!supabase || reviewIds.length === 0) return new Map();
+
+  const [likesResult, commentsResult] = await Promise.all([
+    supabase.from('review_likes').select('review_id').in('review_id', reviewIds),
+    supabase.from('review_comments').select('review_id').in('review_id', reviewIds),
+  ]);
+
+  const counts = new Map(reviewIds.map((id) => [id, { likes: 0, comments: 0 }]));
+  (likesResult.data || []).forEach((item) => {
+    const prev = counts.get(item.review_id) || { likes: 0, comments: 0 };
+    counts.set(item.review_id, { ...prev, likes: prev.likes + 1 });
+  });
+  (commentsResult.data || []).forEach((item) => {
+    const prev = counts.get(item.review_id) || { likes: 0, comments: 0 };
+    counts.set(item.review_id, { ...prev, comments: prev.comments + 1 });
+  });
+
+  return counts;
+}
+
+function sortReviews(reviews, sort) {
+  if (sort === 'likes') return [...reviews].sort((a, b) => (b.likeCount || 0) - (a.likeCount || 0));
+  if (sort === 'comments') return [...reviews].sort((a, b) => (b.commentCount || 0) - (a.commentCount || 0));
+  return reviews;
+}
+
+function mapSupabaseReview(review, engagement = {}) {
   const target = review.albums || review.tracks;
 
   return {
@@ -20,6 +48,8 @@ function mapSupabaseReview(review) {
     rating: Number(review.rating),
     text: review.one_liner || review.body || '감상을 남겼습니다.',
     createdAt: formatTime(review.created_at),
+    likeCount: engagement.likes || 0,
+    commentCount: engagement.comments || 0,
     album: {
       id: target?.id || review.id,
       title: target?.title || 'Unknown Music',
@@ -29,9 +59,15 @@ function mapSupabaseReview(review) {
   };
 }
 
-export default async function ReviewsPage() {
+export default async function ReviewsPage({ searchParams }) {
+  const params = await searchParams;
+  const sort = ['latest', 'likes', 'comments'].includes(params?.sort) ? params.sort : 'latest';
   const { data, error } = await getPublicReviews();
-  const reviews = data?.length ? data.map(mapSupabaseReview) : mockReviews;
+  const reviewIds = (data || []).map((review) => review.id);
+  const engagementCounts = await getEngagementCounts(reviewIds);
+  const reviews = data?.length
+    ? sortReviews(data.map((review) => mapSupabaseReview(review, engagementCounts.get(review.id))), sort)
+    : mockReviews;
 
   return (
     <main>
@@ -43,6 +79,11 @@ export default async function ReviewsPage() {
         <div className="feedTabs" aria-label="리뷰 피드 탭">
           <a className="active" href="/reviews">All Reviews</a>
           <a href="/following">Following</a>
+        </div>
+        <div className="sortTabs" aria-label="리뷰 정렬">
+          <a className={sort === 'latest' ? 'active' : ''} href="/reviews?sort=latest">Latest</a>
+          <a className={sort === 'likes' ? 'active' : ''} href="/reviews?sort=likes">Most Liked</a>
+          <a className={sort === 'comments' ? 'active' : ''} href="/reviews?sort=comments">Most Commented</a>
         </div>
       </section>
       <section className="section topTight narrow">
