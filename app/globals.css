@@ -1694,3 +1694,54 @@ blockquote { line-height: 1.7; }
     font-size: 19px;
   }
 }
+
+.archiveSearchForm {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  margin-bottom: 14px;
+  max-width: 760px;
+}
+.archiveSearchForm input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255,250,241,.72);
+  padding: 12px 14px;
+  color: var(--ink);
+  font: inherit;
+}
+.archiveSearchForm button,
+.archiveSearchForm a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  padding: 0 16px;
+  font-family: 'Space Grotesk';
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.archiveSearchForm button {
+  background: var(--ink);
+  color: var(--paper);
+  cursor: pointer;
+}
+.archiveSearchForm a {
+  background: transparent;
+  color: var(--ink);
+}
+.archiveJumpList a.active {
+  border-color: var(--accent-2);
+  background: rgba(154,74,54,.12);
+  color: var(--accent-2);
+}
+
+@media (max-width: 640px) {
+  .archiveSearchForm {
+    grid-template-columns: 1fr;
+  }
+}
