@@ -19,6 +19,8 @@ function mapReview(review) {
     userId: review.user_id || null,
     rating: Number(review.rating),
     text: review.one_liner || review.body || '감상을 남겼습니다.',
+    body: review.body || '',
+    rawBody: review.body || '',
     createdAt: formatTime(review.created_at),
     album: {
       id: target?.id || review.id,

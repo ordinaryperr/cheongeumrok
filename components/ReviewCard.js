@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import { parseOntologyTags } from '../lib/taste';
 import { supabase } from '../lib/supabase';
 
 function isUuid(value) {
@@ -141,6 +142,9 @@ export default function ReviewCard({ review }) {
     setStatus('idle');
   }
 
+  const parsedTags = review.tags || parseOntologyTags(review.rawBody || review.body || '');
+  const visibleTags = [parsedTags.genre, parsedTags.mood, parsedTags.texture, parsedTags.difficulty].filter(Boolean);
+
   return (
     <article className="reviewCard compact">
       <Link
@@ -159,6 +163,11 @@ export default function ReviewCard({ review }) {
         <p className="artist">{review.album.artist}</p>
         <p className="stars">{'★'.repeat(Math.floor(review.rating))}{review.rating % 1 ? '½' : ''} <span>{review.rating.toFixed(1)}</span></p>
         <p className="reviewText">{review.text}</p>
+        {visibleTags.length ? (
+          <div className="reviewTagChips" aria-label="review taste tags">
+            {visibleTags.map((tag) => <span key={tag}>{tag}</span>)}
+          </div>
+        ) : null}
         <div className="reviewActions">
           <button type="button" onClick={handleLike} disabled={!canInteract || status === 'saving'}>{liked ? '좋아요 취소' : '좋아요'} {likeCount}</button>
           <button type="button" onClick={() => setCommentOpen((open) => !open)} disabled={!canInteract}>댓글 {comments.length}</button>

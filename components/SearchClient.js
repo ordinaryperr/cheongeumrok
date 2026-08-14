@@ -33,6 +33,7 @@ function buildWriteHref(item) {
 
 function ResultCard({ item }) {
   const writeHref = buildWriteHref(item);
+  const browseHref = item.type === 'album' ? `/albums/spotify/${item.id}` : null;
 
   return (
     <article className="spotifyResultCard">
@@ -44,6 +45,7 @@ function ResultCard({ item }) {
         {item.album ? <p className="artist">from {item.album}</p> : null}
         <div className="reviewActions">
           <a href={item.externalUrl || '#'} target="_blank" rel="noreferrer">Spotify</a>
+          {browseHref ? <a href={browseHref}>앨범 둘러보기</a> : null}
           <a href={writeHref}>기록하기</a>
         </div>
       </div>

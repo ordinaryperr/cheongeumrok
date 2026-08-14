@@ -24,6 +24,8 @@ function mapSupabaseReview(review, album) {
     userId: review.user_id || null,
     rating: Number(review.rating),
     text: review.one_liner || review.body || '감상을 남겼습니다.',
+    body: review.body || '',
+    rawBody: review.body || '',
     createdAt: formatTime(review.created_at),
     album: {
       id: album.id,
@@ -48,7 +50,9 @@ function mapSupabaseAlbum(album, albumReviews) {
     rating: average,
     reviews: albumReviews.length,
     mood: ['Spotify', '기록됨'],
-    description: album.external_url ? 'Spotify에서 불러와 청음록에 기록된 앨범입니다.' : '청음록에 기록된 앨범입니다.',
+    description: album.external_url
+      ? `${album.artist}의 ${album.title}은 ${album.release_date?.slice(0, 4) || '연도 미상'}년에 공개된 ${album.album_type || 'album'}입니다. Spotify 메타데이터와 청음록 사용자 기록을 바탕으로 평균 별점, 리뷰, 댓글을 모아 보여줍니다.`
+      : '청음록에 기록된 앨범입니다.',
     coverUrl: album.cover_url,
     externalUrl: album.external_url,
     releaseDate: album.release_date,

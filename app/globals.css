@@ -1475,3 +1475,37 @@ blockquote { line-height: 1.7; }
     gap: 2px;
   }
 }
+
+.reviewTagChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 2px;
+}
+.reviewTagChips span {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255,250,241,.62);
+  padding: 5px 8px;
+  color: var(--accent-2);
+  font-size: 11px;
+  font-family: 'Space Grotesk';
+}
+.feedHelper {
+  max-width: 640px;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+.albumDescriptionBox {
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: rgba(255,250,241,.62);
+  padding: 18px;
+  margin: 16px 0;
+}
+.albumDescriptionBox p:not(.eyebrow) {
+  color: var(--muted);
+  line-height: 1.8;
+}

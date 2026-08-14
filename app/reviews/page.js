@@ -40,6 +40,7 @@ function sortReviews(reviews, sort) {
 
 function mapSupabaseReview(review, engagement = {}) {
   const target = review.albums || review.tracks;
+  const musicTag = review.musicTag || {};
 
   return {
     id: review.id,
@@ -47,6 +48,14 @@ function mapSupabaseReview(review, engagement = {}) {
     userId: review.user_id || null,
     rating: Number(review.rating),
     text: review.one_liner || review.body || '감상을 남겼습니다.',
+    body: review.body || '',
+    rawBody: review.body || '',
+    tags: {
+      genre: musicTag.genre,
+      mood: musicTag.mood,
+      texture: musicTag.texture,
+      difficulty: musicTag.difficulty,
+    },
     createdAt: formatTime(review.created_at),
     likeCount: engagement.likes || 0,
     commentCount: engagement.comments || 0,
@@ -65,8 +74,16 @@ export default async function ReviewsPage({ searchParams }) {
   const { data, error } = await getPublicReviews();
   const reviewIds = (data || []).map((review) => review.id);
   const engagementCounts = await getEngagementCounts(reviewIds);
-  const reviews = data?.length
-    ? sortReviews(data.map((review) => mapSupabaseReview(review, engagementCounts.get(review.id))), sort)
+  const { data: tagData } = supabase
+    ? await supabase.from('music_tags').select('target_type, target_id, genre, mood, texture, difficulty')
+    : { data: [] };
+  const tagMap = new Map((tagData || []).map((tag) => [`${tag.target_type}:${tag.target_id}`, tag]));
+  const enrichedData = (data || []).map((review) => ({
+    ...review,
+    musicTag: tagMap.get(`${review.track_id ? 'track' : 'album'}:${review.track_id || review.album_id}`) || null,
+  }));
+  const reviews = enrichedData.length
+    ? sortReviews(enrichedData.map((review) => mapSupabaseReview(review, engagementCounts.get(review.id))), sort)
     : mockReviews;
 
   return (
@@ -85,6 +102,7 @@ export default async function ReviewsPage({ searchParams }) {
           <a className={sort === 'likes' ? 'active' : ''} href="/reviews?sort=likes">Most Liked</a>
           <a className={sort === 'comments' ? 'active' : ''} href="/reviews?sort=comments">Most Commented</a>
         </div>
+        <p className="feedHelper">리뷰 카드의 태그는 music_tags 테이블을 우선 사용하고, 없으면 감상문 속 청음 태그를 읽습니다.</p>
       </section>
       <section className="section topTight narrow">
         {error ? <p className="empty">Supabase 피드를 불러오지 못해 더미 감상을 보여주고 있습니다.</p> : null}
