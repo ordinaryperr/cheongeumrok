@@ -3,9 +3,8 @@ import AlbumCard from '../components/AlbumCard';
 import ReviewCard from '../components/ReviewCard';
 import NewsCard from '../components/NewsCard';
 import IntroVideo from '../components/IntroVideo';
-import { reviews as mockReviews } from '../data/mock';
 import { news as latestNews } from '../data/news';
-import { getNewsPosts, mapSupabaseNewsPost } from '../lib/news';
+import { getExternalNewsPosts, getNewsPosts, isPlaceholderNewsPost, mapSupabaseNewsPost } from '../lib/news';
 import { getPublicReviews } from '../lib/reviews';
 import { getSpotifyArchiveCollections, getSpotifyStarterAlbums } from '../lib/spotifyArchive';
 import { supabase } from '../lib/supabase';
@@ -64,16 +63,25 @@ async function getRecentAlbums() {
 }
 
 export default async function Home() {
-  const [{ data: reviewData }, { data: albumData }, { data: newsData }, spotifyArchive, starterAlbums] = await Promise.all([
+  const [{ data: reviewData }, { data: albumData }, { data: newsData }, externalNews, spotifyArchive, starterAlbums] = await Promise.all([
     getPublicReviews(),
     getRecentAlbums(),
-    getNewsPosts({ limit: 3 }),
+    getNewsPosts({ limit: 6 }),
+    getExternalNewsPosts(),
     getSpotifyArchiveCollections(),
     getSpotifyStarterAlbums(),
   ]);
-  const albums = albumData?.length ? albumData.map(mapSupabaseAlbum) : starterAlbums;
-  const reviews = reviewData?.length ? reviewData.slice(0, 5).map(mapSupabaseReview) : mockReviews;
-  const news = [...(newsData?.length ? newsData.map(mapSupabaseNewsPost) : []), ...latestNews].slice(0, 3);
+  const hasRecordedAlbums = Boolean(albumData?.length);
+  const albums = hasRecordedAlbums ? albumData.map(mapSupabaseAlbum) : starterAlbums;
+  const reviews = reviewData?.length ? reviewData.slice(0, 5).map(mapSupabaseReview) : [];
+  const editorialNews = (newsData || []).filter((post) => !isPlaceholderNewsPost(post)).map(mapSupabaseNewsPost);
+  const seenNews = new Set();
+  const news = [...externalNews, ...editorialNews, ...latestNews].filter((item) => {
+    const key = item.sourceUrl || item.title;
+    if (seenNews.has(key)) return false;
+    seenNews.add(key);
+    return true;
+  }).slice(0, 3);
 
   return (
     <main className="homePage">
@@ -103,13 +111,13 @@ export default async function Home() {
       <section className="section">
         <div className="sectionTitle">
           <div>
-            <p className="eyebrow">curated albums</p>
-            <h2>지금 남겨진 앨범들</h2>
+            <p className="eyebrow">{hasRecordedAlbums ? 'curated albums' : 'spotify starters'}</p>
+            <h2>{hasRecordedAlbums ? '지금 남겨진 앨범들' : '먼저 둘러볼 실제 앨범들'}</h2>
           </div>
           <a className="textLink" href="/search">더 찾아보기 →</a>
         </div>
         <div className="albumGrid">
-          {albums.map((album) => <AlbumCard key={album.id} album={album} />)}
+          {albums.length ? albums.map((album) => <AlbumCard key={album.id} album={album} />) : <p className="empty">Spotify 앨범을 불러오지 못했습니다. 검색에서 직접 앨범을 찾아보세요.</p>}
         </div>
       </section>
 
@@ -186,7 +194,7 @@ export default async function Home() {
           <a className="textLink" href="/reviews">피드 보기 →</a>
         </div>
         <div className="feedList">
-          {reviews.map((review) => <ReviewCard key={review.id} review={review} />)}
+          {reviews.length ? reviews.map((review) => <ReviewCard key={review.id} review={review} />) : <p className="empty">아직 공개 감상이 없습니다. 첫 감상을 남겨보세요.</p>}
         </div>
       </section>
     </main>
