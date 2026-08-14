@@ -128,7 +128,7 @@ export default async function Home() {
             <p className="eyebrow">good music archive</p>
             <h2>좋은 음악 아카이브</h2>
           </div>
-          <Link className="textLink" href="/search">아카이브 탐색 →</Link>
+          <Link className="textLink" href="/archive">아카이브 탐색 →</Link>
         </div>
         <p className="archiveIntro">
           비슷한 음악을 더 추천하기보다, 아직 내 울타리 밖에 있는 좋은 음악으로 안내합니다.
