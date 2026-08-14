@@ -76,6 +76,42 @@ function mapSupabaseAlbum(album) {
   };
 }
 
+function getPopularAlbums(reviewData = []) {
+  const albumMap = new Map();
+
+  reviewData.forEach((review) => {
+    const album = review.albums;
+    if (!album?.id) return;
+
+    const prev = albumMap.get(album.id) || {
+      id: album.id,
+      title: album.title,
+      artist: album.artist,
+      year: album.release_date?.slice(0, 4) || '연도 미상',
+      genre: album.album_type || 'Spotify Album',
+      ratingTotal: 0,
+      reviews: 0,
+      mood: ['많이 기록됨', '커뮤니티'],
+      coverUrl: album.cover_url,
+      description: '',
+    };
+
+    albumMap.set(album.id, {
+      ...prev,
+      ratingTotal: prev.ratingTotal + Number(review.rating || 0),
+      reviews: prev.reviews + 1,
+    });
+  });
+
+  return Array.from(albumMap.values())
+    .map((album) => ({
+      ...album,
+      rating: album.reviews ? album.ratingTotal / album.reviews : 0,
+    }))
+    .sort((a, b) => b.reviews - a.reviews || b.rating - a.rating)
+    .slice(0, 6);
+}
+
 async function getRecentAlbums() {
   if (!supabase) return { data: null, error: new Error('Supabase is not configured') };
 
@@ -101,6 +137,7 @@ export default async function Home() {
   const albums = hasRecordedAlbums ? albumData.map(mapSupabaseAlbum) : starterAlbums;
   const mappedReviews = reviewData?.length ? reviewData.map((review) => mapSupabaseReview(review, engagementCounts.get(review.id))) : [];
   const reviews = mappedReviews.slice(0, 5);
+  const popularAlbums = getPopularAlbums(reviewData || []);
   const popularReviews = [...mappedReviews]
     .sort((a, b) => ((b.likeCount || 0) + (b.commentCount || 0)) - ((a.likeCount || 0) + (a.commentCount || 0)))
     .filter((review) => (review.likeCount || 0) + (review.commentCount || 0) > 0)
@@ -149,6 +186,19 @@ export default async function Home() {
         </div>
         <div className="albumGrid">
           {albums.length ? albums.map((album) => <AlbumCard key={album.id} album={album} />) : <p className="empty">Spotify 앨범을 불러오지 못했습니다. 검색에서 직접 앨범을 찾아보세요.</p>}
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="sectionTitle">
+          <div>
+            <p className="eyebrow">popular albums</p>
+            <h2>많이 기록된 앨범</h2>
+          </div>
+          <Link className="textLink" href="/reviews">감상으로 보기 →</Link>
+        </div>
+        <div className="albumGrid">
+          {popularAlbums.length ? popularAlbums.map((album) => <AlbumCard key={album.id} album={album} />) : <p className="empty">아직 여러 번 기록된 앨범이 없습니다.</p>}
         </div>
       </section>
 
