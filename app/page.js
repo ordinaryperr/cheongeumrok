@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import AppHeader from '../components/AppHeader';
 import AlbumCard from '../components/AlbumCard';
 import ReviewCard from '../components/ReviewCard';
@@ -97,9 +98,9 @@ export default async function Home() {
           나만의 청음 기록을 쌓으며 취향의 울타리를 넓혀가는 음악 기록 서비스입니다.
         </p>
         <div className="heroActions">
-          <a href="/search" className="primary">첫 음악 기록하기</a>
-          <a href="/reviews" className="secondary">다른 감상 둘러보기</a>
-          <a href="/about" className="secondary">청음록 소개</a>
+          <Link href="/search" className="primary">첫 음악 기록하기</Link>
+          <Link href="/reviews" className="secondary">다른 감상 둘러보기</Link>
+          <Link href="/about" className="secondary">청음록 소개</Link>
         </div>
         <div className="heroFlow" aria-label="청음록 이용 흐름">
           <div><span>01</span><b>검색</b><small>앨범과 곡을 찾습니다.</small></div>
@@ -114,7 +115,7 @@ export default async function Home() {
             <p className="eyebrow">{hasRecordedAlbums ? 'curated albums' : 'spotify starters'}</p>
             <h2>{hasRecordedAlbums ? '지금 남겨진 앨범들' : '먼저 둘러볼 실제 앨범들'}</h2>
           </div>
-          <a className="textLink" href="/search">더 찾아보기 →</a>
+          <Link className="textLink" href="/search">더 찾아보기 →</Link>
         </div>
         <div className="albumGrid">
           {albums.length ? albums.map((album) => <AlbumCard key={album.id} album={album} />) : <p className="empty">Spotify 앨범을 불러오지 못했습니다. 검색에서 직접 앨범을 찾아보세요.</p>}
@@ -127,7 +128,7 @@ export default async function Home() {
             <p className="eyebrow">good music archive</p>
             <h2>좋은 음악 아카이브</h2>
           </div>
-          <a className="textLink" href="/search">아카이브 탐색 →</a>
+          <Link className="textLink" href="/search">아카이브 탐색 →</Link>
         </div>
         <p className="archiveIntro">
           비슷한 음악을 더 추천하기보다, 아직 내 울타리 밖에 있는 좋은 음악으로 안내합니다.
@@ -142,11 +143,11 @@ export default async function Home() {
               <div className="tags">{collection.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
               <div className="archiveAlbums">
                 {collection.albums.map((album) => (
-                  <a href={album.href || `/albums/${album.id}`} key={album.id}>
+                  <Link href={album.href || `/albums/${album.id}`} key={album.id}>
                     <span>{album.coverUrl ? '' : album.title.slice(0, 1)}</span>
                     <b>{album.title}</b>
                     <small>{album.artist}</small>
-                  </a>
+                  </Link>
                 ))}
               </div>
             </article>
@@ -177,7 +178,7 @@ export default async function Home() {
             <p className="eyebrow">music news</p>
             <h2>최근 음악 소식</h2>
           </div>
-          <a className="textLink" href="/news">뉴스 더 보기 →</a>
+          <Link className="textLink" href="/news">뉴스 더 보기 →</Link>
         </div>
         {news.length === 0 ? <p className="empty">등록된 뉴스가 없습니다.</p> : null}
         <div className="newsGrid">
@@ -191,7 +192,7 @@ export default async function Home() {
             <p className="eyebrow">live feed</p>
             <h2>최근 감상</h2>
           </div>
-          <a className="textLink" href="/reviews">피드 보기 →</a>
+          <Link className="textLink" href="/reviews">피드 보기 →</Link>
         </div>
         <div className="feedList">
           {reviews.length ? reviews.map((review) => <ReviewCard key={review.id} review={review} />) : <p className="empty">아직 공개 감상이 없습니다. 첫 감상을 남겨보세요.</p>}

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import AppHeader from '../../components/AppHeader';
 import ReviewCard from '../../components/ReviewCard';
 import { reviews as mockReviews } from '../../data/mock';
@@ -118,17 +119,17 @@ export default async function ReviewsPage({ searchParams }) {
         <h1>다른 사람의 청음 기록</h1>
         <p className="lead">Letterboxd처럼 다른 사람의 감상으로 음악을 발견하는 공간.</p>
         <div className="feedTabs" aria-label="리뷰 피드 탭">
-          <a className="active" href="/reviews">All Reviews</a>
-          <a href="/following">Following</a>
+          <Link className="active" href="/reviews">All Reviews</Link>
+          <Link href="/following">Following</Link>
         </div>
         <div className="sortTabs" aria-label="리뷰 정렬">
-          <a className={sort === 'latest' ? 'active' : ''} href={buildReviewHref({ sort: 'latest', tag: selectedTag })}>Latest</a>
-          <a className={sort === 'likes' ? 'active' : ''} href={buildReviewHref({ sort: 'likes', tag: selectedTag })}>Most Liked</a>
-          <a className={sort === 'comments' ? 'active' : ''} href={buildReviewHref({ sort: 'comments', tag: selectedTag })}>Most Commented</a>
+          <Link className={sort === 'latest' ? 'active' : ''} href={buildReviewHref({ sort: 'latest', tag: selectedTag })}>Latest</Link>
+          <Link className={sort === 'likes' ? 'active' : ''} href={buildReviewHref({ sort: 'likes', tag: selectedTag })}>Most Liked</Link>
+          <Link className={sort === 'comments' ? 'active' : ''} href={buildReviewHref({ sort: 'comments', tag: selectedTag })}>Most Commented</Link>
         </div>
         <div className="tagFilterTabs" aria-label="리뷰 태그 필터">
           {tagOptions.map((tag) => (
-            <a className={selectedTag === tag ? 'active' : ''} href={buildReviewHref({ sort, tag })} key={tag}>{tag}</a>
+            <Link className={selectedTag === tag ? 'active' : ''} href={buildReviewHref({ sort, tag })} key={tag}>{tag}</Link>
           ))}
         </div>
         <p className="feedHelper">리뷰 카드와 필터의 태그는 music_tags 테이블을 우선 사용하고, 없으면 감상문 속 청음 태그를 읽습니다.</p>

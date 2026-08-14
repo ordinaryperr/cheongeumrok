@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 
 async function fetchSearchResults(keyword) {
   const response = await fetch(`/api/spotify/search?q=${encodeURIComponent(keyword)}`, { cache: 'no-store' });
@@ -45,8 +46,8 @@ function ResultCard({ item }) {
         {item.album ? <p className="artist">from {item.album}</p> : null}
         <div className="reviewActions">
           <a href={item.externalUrl || '#'} target="_blank" rel="noreferrer">Spotify</a>
-          {browseHref ? <a href={browseHref}>앨범 둘러보기</a> : null}
-          <a href={writeHref}>기록하기</a>
+          {browseHref ? <Link href={browseHref}>앨범 둘러보기</Link> : null}
+          <Link href={writeHref}>기록하기</Link>
         </div>
       </div>
     </article>

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import AppHeader from '../../../components/AppHeader';
 import ReviewCard from '../../../components/ReviewCard';
 import { parseOntologyTags } from '../../../lib/taste';
@@ -80,7 +81,7 @@ export default async function ReviewDetailPage({ params }) {
             <p className="eyebrow">review</p>
             <h2>리뷰를 찾을 수 없습니다.</h2>
             <p>삭제되었거나 비공개로 전환된 리뷰일 수 있습니다.</p>
-            <div className="heroActions"><a className="primary" href="/reviews">리뷰 피드로 돌아가기</a></div>
+            <div className="heroActions"><Link className="primary" href="/reviews">리뷰 피드로 돌아가기</Link></div>
           </div>
         </section>
       </main>
@@ -105,8 +106,8 @@ export default async function ReviewDetailPage({ params }) {
         <h1>{review.album.title}</h1>
         <p className="lead">{review.album.artist}에 남겨진 하나의 청음 기록입니다. 별점, 문장, 댓글이 모여 음악에 대한 대화가 됩니다.</p>
         <div className="heroActions">
-          <a className="primary" href={`/albums/${review.album.id}`}>앨범 페이지</a>
-          <a className="secondary" href="/reviews">리뷰 피드</a>
+          <Link className="primary" href={`/albums/${review.album.id}`}>앨범 페이지</Link>
+          <Link className="secondary" href="/reviews">리뷰 피드</Link>
         </div>
       </section>
 

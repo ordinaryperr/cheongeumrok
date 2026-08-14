@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import AppHeader from '../../components/AppHeader';
 
 export const metadata = { title: '소개' };
@@ -14,8 +15,8 @@ export default function AboutPage() {
           나만의 음악 기록장을 목표로 만드는 서비스입니다.
         </p>
         <div className="heroActions">
-          <a className="primary" href="/search">첫 기록 남기기</a>
-          <a className="secondary" href="/reviews">다른 감상 보기</a>
+          <Link className="primary" href="/search">첫 기록 남기기</Link>
+          <Link className="secondary" href="/reviews">다른 감상 보기</Link>
         </div>
       </section>
 

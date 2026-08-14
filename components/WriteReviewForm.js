@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { musicTagSchema } from '../data/musicOntology';
 import { inferMusicTags, normalizeMusicTagRecord } from '../lib/taste';
@@ -240,7 +241,7 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
       <label>감상문<textarea value={body} onChange={(event) => setBody(event.target.value)} placeholder="들으면서 떠오른 장면, 감정, 문장, 다른 장르로 이어지는 생각을 적어보세요." /></label>
       <label>취향 확장 메모<input value={expansionNote} onChange={(event) => setExpansionNote(event.target.value)} placeholder="이 앨범이 내 울타리를 어떻게 넓혔나요?" /></label>
       <button type="submit" className="primary full" disabled={status === 'saving'}>{status === 'saving' ? '저장 중...' : '기록 저장하기'}</button>
-      {message ? <p className={`formMessage ${status}`}>{message} {status === 'error' && message.includes('로그인') ? <a href="/login">로그인하러 가기</a> : null}</p> : null}
+      {message ? <p className={`formMessage ${status}`}>{message} {status === 'error' && message.includes('로그인') ? <Link href="/login">로그인하러 가기</Link> : null}</p> : null}
     </form>
   );
 }

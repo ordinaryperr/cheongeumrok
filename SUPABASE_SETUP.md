@@ -38,19 +38,30 @@ Supabase 대시보드에서:
 - `reviews`
 - `review_likes`
 - `review_comments`
+- `album_comments`
 - `follows`
 - `news_posts`
 
-## 4. 로컬 실행
+## 4. 취향 온톨로지 스키마 실행
+
+취향 태그/추천 신호 기능을 사용하려면 Supabase SQL Editor에서 `supabase/ontology-schema.sql`도 실행합니다.
+
+생성되는 테이블:
+
+- `music_tags`
+- `user_taste_signals`
+
+## 5. 로컬 실행
 
 ```bash
 npm run dev
 ```
 
-## 5. 다음 구현 순서
+## 6. 현재 구현된 핵심 흐름
 
-1. 로그인/회원가입 페이지
-2. `/write`에서 실제 리뷰 저장
-3. `/reviews`에서 Supabase 리뷰 불러오기
-4. `/profile`에서 내 리뷰만 표시
-5. Spotify API 검색 연결
+1. 로그인/회원가입
+2. Spotify 앨범/트랙 검색
+3. `/write`에서 리뷰 저장
+4. `/reviews`에서 공개 리뷰 불러오기
+5. `/profile`에서 내 리뷰 표시 및 수정/삭제
+6. 태그 기반 리뷰 필터와 취향 신호 표시

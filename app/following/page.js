@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import AppHeader from '../../components/AppHeader';
 import FollowingFeed from '../../components/FollowingFeed';
 
@@ -15,8 +16,8 @@ export default async function FollowingPage({ searchParams }) {
         <h1>팔로우한 리스너의 기록</h1>
         <p className="lead">내가 따라가는 사람들의 청음 기록을 모아봅니다. 다른 사람의 울타리를 따라가며 새로운 음악을 발견하세요.</p>
         <div className="feedTabs" aria-label="리뷰 피드 탭">
-          <a href="/reviews">All Reviews</a>
-          <a className="active" href="/following">Following</a>
+          <Link href="/reviews">All Reviews</Link>
+          <Link className="active" href="/following">Following</Link>
         </div>
       </section>
       <section className="section topTight narrow">
