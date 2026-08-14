@@ -1745,3 +1745,32 @@ blockquote { line-height: 1.7; }
     grid-template-columns: 1fr;
   }
 }
+
+.archiveRouteBox {
+  display: grid;
+  gap: 5px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(45,74,62,.07);
+  padding: 12px;
+}
+.archiveRouteBox span {
+  color: var(--muted);
+  font-family: 'Space Grotesk';
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.archiveRouteBox b {
+  color: var(--ink);
+  font-size: 15px;
+}
+.archiveRouteBox a,
+.archiveRouteBox em {
+  color: var(--accent-2);
+  font-style: normal;
+  font-size: 13px;
+}
+.curriculumTrack {
+  scroll-margin-top: 110px;
+}

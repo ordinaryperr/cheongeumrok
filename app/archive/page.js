@@ -35,6 +35,16 @@ function filterCollections(collections, { genre, q }) {
   });
 }
 
+function getBeyondRoute(collection) {
+  const primary = collection.tags[0];
+  const routes = {
+    Jazz: { href: '/beyond-your-fence#jazz', label: 'Freshman available' },
+    Ambient: { href: '/beyond-your-fence#ambient', label: 'Freshman available' },
+    'Post-Punk': { href: '/beyond-your-fence#post-punk', label: 'Freshman available' },
+  };
+  return routes[primary] || { href: null, label: 'Coming soon' };
+}
+
 function buildWriteHref(album) {
   const params = new URLSearchParams({
     spotify: album.id,
@@ -88,12 +98,20 @@ export default async function ArchivePage({ searchParams }) {
         {(query || selectedGenre !== 'All') ? <p className="feedHelper">현재 필터: {selectedGenre} {query ? `· “${query}”` : ''}</p> : null}
 
         <div className="archiveGrid archiveExploreGrid">
-          {filteredCollections.length ? filteredCollections.map((collection) => (
+          {filteredCollections.length ? filteredCollections.map((collection) => {
+            const beyondRoute = getBeyondRoute(collection);
+
+            return (
             <article className="archiveCard archiveExploreCard" id={collection.id} key={collection.id}>
               <p className="mood">{collection.subtitle}</p>
               <h2>{collection.title}</h2>
               <p>{collection.description}</p>
               <div className="tags">{collection.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
+              <div className="archiveRouteBox">
+                <span>Beyond Route</span>
+                <b>{beyondRoute.label}</b>
+                {beyondRoute.href ? <Link href={beyondRoute.href}>커리큘럼에서 시작하기 →</Link> : <em>커리큘럼 준비 중</em>}
+              </div>
               <div className="archiveExploreAlbums">
                 {collection.albums.map((album) => (
                   <article className="archiveExploreAlbum" key={album.id}>
@@ -113,7 +131,8 @@ export default async function ArchivePage({ searchParams }) {
                 ))}
               </div>
             </article>
-          )) : <p className="empty">조건에 맞는 아카이브가 없습니다. 장르나 검색어를 바꿔보세요.</p>}
+          );
+          }) : <p className="empty">조건에 맞는 아카이브가 없습니다. 장르나 검색어를 바꿔보세요.</p>}
         </div>
       </section>
     </main>

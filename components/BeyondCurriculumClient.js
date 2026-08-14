@@ -111,7 +111,7 @@ export default function BeyondCurriculumClient() {
         let previousComplete = true;
 
         return (
-          <article className="curriculumTrack" key={track.id}>
+          <article className="curriculumTrack" id={track.id} key={track.id}>
             <div className="trackIntro">
               <p className="eyebrow">{track.signal}</p>
               <h2>{track.genre}</h2>
