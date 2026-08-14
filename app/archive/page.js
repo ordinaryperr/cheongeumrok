@@ -5,7 +5,7 @@ import { getSpotifyArchiveCollections } from '../../lib/spotifyArchive';
 export const metadata = { title: '좋은 음악 아카이브 | 청음록' };
 export const dynamic = 'force-dynamic';
 
-const genreOptions = ['All', 'Jazz', 'Ambient', 'Post-Punk', 'Hip-Hop', 'Dubstep', 'R&B', 'Electronic', 'Shoegaze', 'Metal'];
+const genreOptions = ['All', 'Jazz', 'Ambient', 'Post-Punk', 'Hip-Hop', 'Dubstep', 'R&B', 'Electronic', 'Shoegaze', 'Metal', 'Experimental', 'Classical'];
 
 function buildArchiveHref({ genre = 'All', q = '' } = {}) {
   const params = new URLSearchParams();
@@ -41,6 +41,14 @@ function getBeyondRoute(collection) {
     Jazz: { href: '/beyond-your-fence#jazz', label: 'Freshman available' },
     Ambient: { href: '/beyond-your-fence#ambient', label: 'Freshman available' },
     'Post-Punk': { href: '/beyond-your-fence#post-punk', label: 'Freshman available' },
+    'Hip-Hop': { href: '/beyond-your-fence#hip-hop', label: 'Freshman available' },
+    Dubstep: { href: '/beyond-your-fence#dubstep', label: 'Freshman available' },
+    'R&B': { href: '/beyond-your-fence#rnb', label: 'Freshman available' },
+    Electronic: { href: '/beyond-your-fence#electronic', label: 'Freshman available' },
+    Shoegaze: { href: '/beyond-your-fence#shoegaze', label: 'Freshman available' },
+    Metal: { href: '/beyond-your-fence#metal', label: 'Freshman available' },
+    Experimental: { href: '/beyond-your-fence#experimental', label: 'Freshman available' },
+    Classical: { href: '/beyond-your-fence#classical-contemporary', label: 'Freshman available' },
   };
   return routes[primary] || { href: null, label: 'Coming soon' };
 }
