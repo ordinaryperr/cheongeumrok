@@ -2,6 +2,7 @@ import AppHeader from '../../components/AppHeader';
 import ReviewCard from '../../components/ReviewCard';
 import { reviews as mockReviews } from '../../data/mock';
 import { getPublicReviews } from '../../lib/reviews';
+import { parseOntologyTags } from '../../lib/taste';
 import { supabase } from '../../lib/supabase';
 
 export const metadata = { title: '리뷰 피드 | 청음록' };
@@ -38,9 +39,34 @@ function sortReviews(reviews, sort) {
   return reviews;
 }
 
+function getReviewTags(review) {
+  const fallback = parseOntologyTags(review.body || '');
+  const musicTag = review.musicTag || {};
+  return {
+    genre: musicTag.genre || fallback.genre || '',
+    mood: musicTag.mood || fallback.mood || '',
+    texture: musicTag.texture || fallback.texture || '',
+    difficulty: musicTag.difficulty || fallback.difficulty || '',
+  };
+}
+
+function filterReviewsByTag(reviews, tag) {
+  if (!tag || tag === 'All') return reviews;
+  const normalized = String(tag).toLowerCase();
+  return reviews.filter((review) => Object.values(review.tags || {}).some((value) => String(value).toLowerCase() === normalized));
+}
+
+function buildReviewHref({ sort, tag }) {
+  const params = new URLSearchParams();
+  if (sort && sort !== 'latest') params.set('sort', sort);
+  if (tag && tag !== 'All') params.set('tag', tag);
+  const query = params.toString();
+  return query ? `/reviews?${query}` : '/reviews';
+}
+
 function mapSupabaseReview(review, engagement = {}) {
   const target = review.albums || review.tracks;
-  const musicTag = review.musicTag || {};
+  const tags = getReviewTags(review);
 
   return {
     id: review.id,
@@ -50,12 +76,7 @@ function mapSupabaseReview(review, engagement = {}) {
     text: review.one_liner || review.body || '감상을 남겼습니다.',
     body: review.body || '',
     rawBody: review.body || '',
-    tags: {
-      genre: musicTag.genre,
-      mood: musicTag.mood,
-      texture: musicTag.texture,
-      difficulty: musicTag.difficulty,
-    },
+    tags,
     createdAt: formatTime(review.created_at),
     likeCount: engagement.likes || 0,
     commentCount: engagement.comments || 0,
@@ -71,6 +92,7 @@ function mapSupabaseReview(review, engagement = {}) {
 export default async function ReviewsPage({ searchParams }) {
   const params = await searchParams;
   const sort = ['latest', 'likes', 'comments'].includes(params?.sort) ? params.sort : 'latest';
+  const selectedTag = typeof params?.tag === 'string' ? params.tag : 'All';
   const { data, error } = await getPublicReviews();
   const reviewIds = (data || []).map((review) => review.id);
   const engagementCounts = await getEngagementCounts(reviewIds);
@@ -82,9 +104,11 @@ export default async function ReviewsPage({ searchParams }) {
     ...review,
     musicTag: tagMap.get(`${review.track_id ? 'track' : 'album'}:${review.track_id || review.album_id}`) || null,
   }));
-  const reviews = enrichedData.length
-    ? sortReviews(enrichedData.map((review) => mapSupabaseReview(review, engagementCounts.get(review.id))), sort)
+  const mappedReviews = enrichedData.length
+    ? enrichedData.map((review) => mapSupabaseReview(review, engagementCounts.get(review.id)))
     : mockReviews;
+  const tagOptions = ['All', 'Jazz', 'Ambient', 'Post-Punk', 'R&B', 'Hip-Hop', 'Electronic', 'Freshman', 'Sophomore', 'Junior', 'Senior'];
+  const reviews = sortReviews(filterReviewsByTag(mappedReviews, selectedTag), sort);
 
   return (
     <main>
@@ -98,15 +122,20 @@ export default async function ReviewsPage({ searchParams }) {
           <a href="/following">Following</a>
         </div>
         <div className="sortTabs" aria-label="리뷰 정렬">
-          <a className={sort === 'latest' ? 'active' : ''} href="/reviews?sort=latest">Latest</a>
-          <a className={sort === 'likes' ? 'active' : ''} href="/reviews?sort=likes">Most Liked</a>
-          <a className={sort === 'comments' ? 'active' : ''} href="/reviews?sort=comments">Most Commented</a>
+          <a className={sort === 'latest' ? 'active' : ''} href={buildReviewHref({ sort: 'latest', tag: selectedTag })}>Latest</a>
+          <a className={sort === 'likes' ? 'active' : ''} href={buildReviewHref({ sort: 'likes', tag: selectedTag })}>Most Liked</a>
+          <a className={sort === 'comments' ? 'active' : ''} href={buildReviewHref({ sort: 'comments', tag: selectedTag })}>Most Commented</a>
         </div>
-        <p className="feedHelper">리뷰 카드의 태그는 music_tags 테이블을 우선 사용하고, 없으면 감상문 속 청음 태그를 읽습니다.</p>
+        <div className="tagFilterTabs" aria-label="리뷰 태그 필터">
+          {tagOptions.map((tag) => (
+            <a className={selectedTag === tag ? 'active' : ''} href={buildReviewHref({ sort, tag })} key={tag}>{tag}</a>
+          ))}
+        </div>
+        <p className="feedHelper">리뷰 카드와 필터의 태그는 music_tags 테이블을 우선 사용하고, 없으면 감상문 속 청음 태그를 읽습니다.</p>
       </section>
       <section className="section topTight narrow">
         {error ? <p className="empty">Supabase 피드를 불러오지 못해 더미 감상을 보여주고 있습니다.</p> : null}
-        <div className="feedList">{reviews.map((review) => <ReviewCard key={review.id} review={review} />)}</div>
+        <div className="feedList">{reviews.length ? reviews.map((review) => <ReviewCard key={review.id} review={review} />) : <p className="empty">선택한 태그의 리뷰가 아직 없습니다.</p>}</div>
       </section>
     </main>
   );
