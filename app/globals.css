@@ -1914,3 +1914,53 @@ blockquote { line-height: 1.7; }
   font-size: 12px;
   line-height: 1.45;
 }
+
+.albumRouteBox,
+.saveProgressNotice {
+  display: grid;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(45,74,62,.08);
+  padding: 14px;
+  margin: 14px 0;
+}
+.albumRouteBox span,
+.saveProgressNotice b {
+  color: var(--accent-2);
+  font-family: 'Space Grotesk';
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.albumRouteBox b,
+.saveProgressNotice span {
+  color: var(--muted);
+  line-height: 1.55;
+}
+.albumRouteBox a {
+  color: var(--accent-2);
+  font-size: 13px;
+}
+.inlineComment button {
+  grid-column: 1 / -1;
+  justify-self: start;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  padding: 4px 8px;
+  font-size: 11px;
+}
+.archiveMoreAlbums {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--line);
+  border-radius: 18px;
+  color: var(--accent-2);
+  font-family: 'Space Grotesk';
+  font-size: 12px;
+  letter-spacing: .06em;
+}

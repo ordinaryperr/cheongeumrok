@@ -1,7 +1,20 @@
 import AppHeader from '../../../../components/AppHeader';
 import { getSpotifyItem } from '../../../../lib/spotify';
+import { inferMusicTags } from '../../../../lib/taste';
 
 export const dynamic = 'force-dynamic';
+
+function genreParam(value = '') {
+  return String(value).toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function getAlbumRouteHint(album) {
+  const tags = inferMusicTags({ title: album.title, artist: album.artist, year: album.year });
+  const genre = tags.genre?.find((item) => !['Unknown', 'unclassified'].includes(item));
+  if (!genre) return null;
+  const param = genreParam(genre);
+  return { genre, href: `/beyond-your-fence?genre=${param}#${param}` };
+}
 
 function getWriteHref(album) {
   const params = new URLSearchParams({
@@ -58,6 +71,8 @@ export default async function SpotifyAlbumPreviewPage({ params }) {
     );
   }
 
+  const routeHint = getAlbumRouteHint(album);
+
   return (
     <main>
       <AppHeader />
@@ -76,6 +91,13 @@ export default async function SpotifyAlbumPreviewPage({ params }) {
             <p className="eyebrow">album description</p>
             <p>{buildSpotifyAlbumDescription(album)}</p>
           </article>
+          {routeHint ? (
+            <div className="albumRouteBox">
+              <span>Archive / Beyond Route</span>
+              <b>{routeHint.genre} Freshman Route와 연결될 수 있습니다.</b>
+              <a href={routeHint.href}>Beyond에서 보기 →</a>
+            </div>
+          ) : null}
           <div className="heroActions">
             <a className="primary" href={getWriteHref(album)}>이 앨범 기록하기</a>
             {album.externalUrl ? <a className="secondary spotifyButton" href={album.externalUrl} target="_blank" rel="noreferrer">Spotify에서 듣기</a> : null}

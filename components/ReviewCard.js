@@ -110,6 +110,18 @@ export default function ReviewCard({ review }) {
     setStatus('idle');
   }
 
+  async function handleDeleteComment(commentId) {
+    if (!supabase) return;
+    const ok = window.confirm('댓글을 삭제할까요?');
+    if (!ok) return;
+
+    setStatus('saving');
+    const { error } = await supabase.from('review_comments').delete().eq('id', commentId);
+    if (error) setMessage(error.message);
+    else setComments((items) => items.filter((item) => item.id !== commentId));
+    setStatus('idle');
+  }
+
   async function handleCommentSubmit(event) {
     event.preventDefault();
     if (!canInteract || !commentBody.trim()) return;
@@ -183,10 +195,11 @@ export default function ReviewCard({ review }) {
                 <b>{comment.user_id === user?.id ? 'me' : 'listener'}</b>
                 <span>{formatCommentTime(comment.created_at)}</span>
                 <p>{comment.body}</p>
+                {comment.user_id === user?.id ? <button type="button" onClick={() => handleDeleteComment(comment.id)} disabled={status === 'saving'}>삭제</button> : null}
               </div>
             )) : <p className="socialMessage">아직 댓글이 없습니다. 첫 의견을 남겨보세요.</p>}
             <form className="inlineCommentForm" onSubmit={handleCommentSubmit}>
-              <input value={commentBody} onChange={(event) => setCommentBody(event.target.value)} placeholder="이 감상에 대한 의견을 남겨보세요." />
+              <input value={commentBody} onChange={(event) => setCommentBody(event.target.value)} placeholder="이 감상에 대한 의견을 남겨보세요. Enter로 등록" />
               <button type="submit" disabled={status === 'saving' || !commentBody.trim()}>{status === 'saving' ? '등록 중' : '댓글'}</button>
             </form>
           </div>

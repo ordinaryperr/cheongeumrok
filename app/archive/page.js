@@ -138,6 +138,9 @@ export default async function ArchivePage({ searchParams }) {
                     </div>
                   </article>
                 ))}
+                <Link className="archiveMoreAlbums" href={`/search?q=${encodeURIComponent(collection.tags[0])}`}>
+                  더 많은 {collection.tags[0]} 앨범 보기 →
+                </Link>
               </div>
             </article>
           );

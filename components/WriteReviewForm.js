@@ -214,7 +214,7 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
       setRecommendedTrack('');
       setBody('');
       setExpansionNote('');
-      router.replace(`/albums/${albumId}`);
+      router.replace(`/albums/${albumId}?saved=1`);
       router.refresh();
     } catch (error) {
       setStatus('error');

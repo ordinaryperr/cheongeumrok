@@ -3,6 +3,7 @@ import ReviewCard from '../../../components/ReviewCard';
 import AlbumComments from '../../../components/AlbumComments';
 import MyAlbumRating from '../../../components/MyAlbumRating';
 import { getAlbumComments, mapAlbumComment } from '../../../lib/comments';
+import { inferMusicTags } from '../../../lib/taste';
 import { supabase } from '../../../lib/supabase';
 
 export const dynamic = 'force-dynamic';
@@ -116,8 +117,22 @@ export async function generateMetadata({ params }) {
   return { title: album ? `${album.title} - ${album.artist} | 청음록` : '앨범을 찾을 수 없습니다 | 청음록' };
 }
 
-export default async function AlbumPage({ params }) {
+function genreParam(value = '') {
+  return String(value).toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function getAlbumRouteHint(album) {
+  const tags = inferMusicTags({ title: album.title, artist: album.artist, genre: album.genre, year: album.year });
+  const genre = tags.genre?.find((item) => !['Unknown', 'unclassified'].includes(item));
+  if (!genre) return null;
+  const param = genreParam(genre);
+  return { genre, href: `/beyond-your-fence?genre=${param}#${param}` };
+}
+
+export default async function AlbumPage({ params, searchParams }) {
   const { id } = await params;
+  const query = await searchParams;
+  const saved = query?.saved === '1';
   const supabaseData = await getSupabaseAlbum(id);
   if (!supabaseData?.album) {
     return (
@@ -143,6 +158,7 @@ export default async function AlbumPage({ params }) {
   const distribution = getRatingDistribution(albumReviews);
   const maxDistributionCount = Math.max(...distribution.map((item) => item.count), 1);
   const writeHref = getWriteHref(album);
+  const routeHint = getAlbumRouteHint(album);
 
   return (
     <main>
@@ -168,7 +184,20 @@ export default async function AlbumPage({ params }) {
               </div>
             ))}
           </div>
+          {saved ? (
+            <div className="saveProgressNotice">
+              <b>기록이 저장되었습니다.</b>
+              <span>이 기록은 music_tags와 Beyond 진행도 계산에 반영됩니다. 아래 리뷰 목록과 내 프로필의 Beyond 요약에서 변화를 확인할 수 있습니다.</span>
+            </div>
+          ) : null}
           <p className="bodyText">{album.description}</p>
+          {routeHint ? (
+            <div className="albumRouteBox">
+              <span>Archive / Beyond Route</span>
+              <b>{routeHint.genre} Freshman Route와 연결될 수 있습니다.</b>
+              <a href={routeHint.href}>Beyond에서 보기 →</a>
+            </div>
+          ) : null}
           <div className="tags">{album.mood.map((tag) => <span key={tag}>{tag}</span>)}</div>
           <div className="quickRating" aria-label="별점 입력 미리보기">
             {[0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5].map((score) => <span key={score}>{score}</span>)}
