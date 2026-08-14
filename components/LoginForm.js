@@ -1,11 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../lib/supabase';
 
 export default function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get('next');
+  const nextPath = next?.startsWith('/') && !next.startsWith('//') ? next : '/write';
   const [mode, setMode] = useState('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -38,7 +41,7 @@ export default function LoginForm() {
     setStatus('done');
 
     if (mode === 'signin') {
-      router.replace('/write');
+      router.replace(nextPath);
       router.refresh();
       return;
     }

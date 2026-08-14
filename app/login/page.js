@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import AppHeader from '../../components/AppHeader';
 import LoginForm from '../../components/LoginForm';
 
@@ -13,7 +14,9 @@ export default function LoginPage() {
         <p className="lead">별점과 감상은 계정에 연결되어 내 청음 아카이브로 쌓입니다.</p>
       </section>
       <section className="section topTight narrow">
-        <LoginForm />
+        <Suspense fallback={<p className="empty">로그인 폼을 불러오는 중입니다.</p>}>
+          <LoginForm />
+        </Suspense>
       </section>
     </main>
   );

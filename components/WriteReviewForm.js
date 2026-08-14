@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { musicTagSchema } from '../data/musicOntology';
 import { inferMusicTags, normalizeMusicTagRecord } from '../lib/taste';
 import { syncUserTasteSignals } from '../lib/userTasteSignals';
@@ -12,6 +12,8 @@ const scores = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
 export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [selectedMockId, setSelectedMockId] = useState(selectedMusic?.mockId || fallbackAlbums[0]?.id || '');
   const [rating, setRating] = useState(4.5);
   const [oneLiner, setOneLiner] = useState('');
@@ -20,6 +22,7 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
   const [expansionNote, setExpansionNote] = useState('');
   const [status, setStatus] = useState('idle');
   const [message, setMessage] = useState('');
+  const [authStatus, setAuthStatus] = useState('checking');
 
   const currentMock = fallbackAlbums.find((album) => album.id === selectedMockId) || fallbackAlbums[0];
   const music = selectedMusic || {
@@ -37,6 +40,35 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
   const [moodTag, setMoodTag] = useState(inferredTags.mood[0] === 'unclassified' ? musicTagSchema.mood[0] : inferredTags.mood[0]);
   const [textureTag, setTextureTag] = useState(inferredTags.texture[0] === 'unclassified' ? musicTagSchema.texture[0] : inferredTags.texture[0]);
   const [difficultyTag, setDifficultyTag] = useState('Freshman');
+  const queryString = searchParams.toString();
+  const nextPath = `${pathname}${queryString ? `?${queryString}` : ''}`;
+  const loginHref = `/login?next=${encodeURIComponent(nextPath)}`;
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function checkAuth() {
+      if (!supabase) {
+        setAuthStatus('unconfigured');
+        return;
+      }
+
+      const { data } = await supabase.auth.getUser();
+      if (!mounted) return;
+      setAuthStatus(data?.user ? 'signedIn' : 'signedOut');
+    }
+
+    checkAuth();
+
+    const { data: listener } = supabase?.auth.onAuthStateChange((_event, session) => {
+      setAuthStatus(session?.user ? 'signedIn' : 'signedOut');
+    }) || { data: null };
+
+    return () => {
+      mounted = false;
+      listener?.subscription?.unsubscribe();
+    };
+  }, []);
 
   async function upsertAlbum(item) {
     const { data, error } = await supabase
@@ -190,6 +222,24 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
     }
   }
 
+  if (authStatus === 'checking') {
+    return <p className="empty">로그인 상태를 확인하는 중입니다.</p>;
+  }
+
+  if (authStatus === 'signedOut') {
+    return (
+      <div className="emptyState">
+        <p className="eyebrow">login required</p>
+        <h2>기록 저장은 로그인 후 가능합니다.</h2>
+        <p>선택한 음악을 유지한 채 로그인한 뒤 바로 감상을 이어서 남길 수 있어요.</p>
+        <div className="heroActions">
+          <Link className="primary" href={loginHref}>로그인하고 기록하기</Link>
+          <Link className="secondary" href="/search">다른 음악 찾기</Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <form className="writeForm" onSubmit={handleSubmit}>
       <label>선택한 음악
@@ -241,7 +291,7 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
       <label>감상문<textarea value={body} onChange={(event) => setBody(event.target.value)} placeholder="들으면서 떠오른 장면, 감정, 문장, 다른 장르로 이어지는 생각을 적어보세요." /></label>
       <label>취향 확장 메모<input value={expansionNote} onChange={(event) => setExpansionNote(event.target.value)} placeholder="이 앨범이 내 울타리를 어떻게 넓혔나요?" /></label>
       <button type="submit" className="primary full" disabled={status === 'saving'}>{status === 'saving' ? '저장 중...' : '기록 저장하기'}</button>
-      {message ? <p className={`formMessage ${status}`}>{message} {status === 'error' && message.includes('로그인') ? <Link href="/login">로그인하러 가기</Link> : null}</p> : null}
+      {message ? <p className={`formMessage ${status}`}>{message} {status === 'error' && message.includes('로그인') ? <Link href={loginHref}>로그인하러 가기</Link> : null}</p> : null}
     </form>
   );
 }
