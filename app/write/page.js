@@ -1,5 +1,4 @@
 import AppHeader from '../../components/AppHeader';
-import { albums } from '../../data/mock';
 import { getSpotifyItem, hasSpotifyCredentials } from '../../lib/spotify';
 import WriteReviewForm from '../../components/WriteReviewForm';
 
@@ -7,7 +6,6 @@ export const metadata = { title: '감상 기록하기 | 청음록' };
 
 export default async function WritePage({ searchParams }) {
   const params = await searchParams;
-  const selectedAlbum = albums.find((item) => item.id === params?.album) || albums[0];
   let spotifyItem = null;
 
   if (params?.spotify && params?.type && params?.title && params?.artist) {
@@ -31,7 +29,7 @@ export default async function WritePage({ searchParams }) {
     }
   }
 
-  const selectedTypeLabel = spotifyItem?.type === 'track' ? 'Spotify Track' : spotifyItem?.type === 'album' ? 'Spotify Album' : 'Mock Album';
+  const selectedTypeLabel = spotifyItem?.type === 'track' ? 'Spotify Track' : 'Spotify Album';
 
   return (
     <main>
@@ -39,7 +37,7 @@ export default async function WritePage({ searchParams }) {
       <section className="pageHero small">
         <p className="eyebrow">write</p>
         <h1>오늘의 감상을 남겨보세요.</h1>
-        <p className="lead">별점으로 시작해 한줄평, 긴 감상, 추천 트랙까지 이어지는 기록 흐름입니다. 좋은 음악을 나만의 언어로 남겨보세요.</p>
+        <p className="lead">Spotify 검색 결과에서 선택한 앨범이나 곡만 기록할 수 있습니다. 먼저 음악을 찾고, 좋은 음악을 나만의 언어로 남겨보세요.</p>
       </section>
       <section className="section topTight narrow">
         <div className="writeFlow">
@@ -49,18 +47,27 @@ export default async function WritePage({ searchParams }) {
           <div><span>04</span><b>대화</b><small>댓글과 추천으로 이어집니다.</small></div>
         </div>
         {spotifyItem ? (
-          <article className="selectedMusicCard">
-            {spotifyItem.coverUrl ? <div className="spotifyCover bigCover" style={{ backgroundImage: `url(${spotifyItem.coverUrl})` }} /> : <div className="cover"><span>{spotifyItem.title.slice(0, 1)}</span></div>}
-            <div>
-              <p className="mood">{selectedTypeLabel} · {spotifyItem.year}</p>
-              <h3>{spotifyItem.title}</h3>
-              <p className="artist">{spotifyItem.artist}</p>
-              {spotifyItem.album ? <p className="artist">from {spotifyItem.album}</p> : null}
-              <p className="bodyText">검색 결과에서 선택한 음악이 작성 폼에 자동으로 반영되었습니다.</p>
-            </div>
-          </article>
-        ) : null}
-        <WriteReviewForm selectedMusic={spotifyItem} fallbackAlbums={albums} />
+          <>
+            <article className="selectedMusicCard">
+              {spotifyItem.coverUrl ? <div className="spotifyCover bigCover" style={{ backgroundImage: `url(${spotifyItem.coverUrl})` }} /> : <div className="cover"><span>{spotifyItem.title.slice(0, 1)}</span></div>}
+              <div>
+                <p className="mood">{selectedTypeLabel} · {spotifyItem.year}</p>
+                <h3>{spotifyItem.title}</h3>
+                <p className="artist">{spotifyItem.artist}</p>
+                {spotifyItem.album ? <p className="artist">from {spotifyItem.album}</p> : null}
+                <p className="bodyText">검색 결과에서 선택한 음악이 작성 폼에 자동으로 반영되었습니다.</p>
+              </div>
+            </article>
+            <WriteReviewForm selectedMusic={spotifyItem} fallbackAlbums={[]} />
+          </>
+        ) : (
+          <div className="emptyState">
+            <p className="eyebrow">select music first</p>
+            <h2>먼저 음악을 검색해주세요.</h2>
+            <p>청음록은 실제 Spotify 앨범/곡을 선택한 뒤 감상을 기록합니다.</p>
+            <div className="heroActions"><a className="primary" href="/search">검색하러 가기</a></div>
+          </div>
+        )}
       </section>
     </main>
   );
