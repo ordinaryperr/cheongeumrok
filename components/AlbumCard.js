@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function AlbumCard({ album }) {
   return (
-    <Link className="albumCard" href={`/albums/${album.id}`}>
+    <Link className="albumCard" href={album.href || `/albums/${album.id}`}>
       {album.coverUrl ? <div className="cover imageCover" style={{ backgroundImage: `url(${album.coverUrl})` }}><span /></div> : <div className="cover"><span>{album.title.slice(0, 1)}</span></div>}
       <div>
         <p className="mood">{album.genre} · {album.year}</p>

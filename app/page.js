@@ -3,10 +3,11 @@ import AlbumCard from '../components/AlbumCard';
 import ReviewCard from '../components/ReviewCard';
 import NewsCard from '../components/NewsCard';
 import IntroVideo from '../components/IntroVideo';
-import { albums as mockAlbums, reviews as mockReviews, goodMusicArchive } from '../data/mock';
+import { reviews as mockReviews } from '../data/mock';
 import { news as latestNews } from '../data/news';
 import { getNewsPosts, mapSupabaseNewsPost } from '../lib/news';
 import { getPublicReviews } from '../lib/reviews';
+import { getSpotifyArchiveCollections, getSpotifyStarterAlbums } from '../lib/spotifyArchive';
 import { supabase } from '../lib/supabase';
 
 export const dynamic = 'force-dynamic';
@@ -63,12 +64,14 @@ async function getRecentAlbums() {
 }
 
 export default async function Home() {
-  const [{ data: reviewData }, { data: albumData }, { data: newsData }] = await Promise.all([
+  const [{ data: reviewData }, { data: albumData }, { data: newsData }, spotifyArchive, starterAlbums] = await Promise.all([
     getPublicReviews(),
     getRecentAlbums(),
     getNewsPosts({ limit: 3 }),
+    getSpotifyArchiveCollections(),
+    getSpotifyStarterAlbums(),
   ]);
-  const albums = albumData?.length ? albumData.map(mapSupabaseAlbum) : mockAlbums;
+  const albums = albumData?.length ? albumData.map(mapSupabaseAlbum) : starterAlbums;
   const reviews = reviewData?.length ? reviewData.slice(0, 5).map(mapSupabaseReview) : mockReviews;
   const news = [...(newsData?.length ? newsData.map(mapSupabaseNewsPost) : []), ...latestNews].slice(0, 3);
 
@@ -123,7 +126,7 @@ export default async function Home() {
           장르별 입문작, 오래 남은 음반, 함께 이야기할 만한 작품을 묶어 소개합니다.
         </p>
         <div className="archiveGrid">
-          {goodMusicArchive.map((collection) => (
+          {spotifyArchive.length ? spotifyArchive.map((collection) => (
             <article className="archiveCard" key={collection.id}>
               <p className="mood">{collection.subtitle}</p>
               <h3>{collection.title}</h3>
@@ -131,15 +134,15 @@ export default async function Home() {
               <div className="tags">{collection.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
               <div className="archiveAlbums">
                 {collection.albums.map((album) => (
-                  <a href={`/albums/${album.id}`} key={album.id}>
-                    <span>{album.title.slice(0, 1)}</span>
+                  <a href={album.href || `/albums/${album.id}`} key={album.id}>
+                    <span>{album.coverUrl ? '' : album.title.slice(0, 1)}</span>
                     <b>{album.title}</b>
                     <small>{album.artist}</small>
                   </a>
                 ))}
               </div>
             </article>
-          ))}
+          )) : <p className="empty">Spotify 아카이브를 불러오는 중 문제가 생겼습니다. 잠시 후 다시 시도해 주세요.</p>}
         </div>
       </section>
 
