@@ -209,12 +209,12 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
       }
 
       setStatus('done');
-      setMessage('기록이 저장되었습니다. 내 기록으로 이동합니다.');
+      setMessage('기록이 저장되었습니다. 앨범 페이지로 이동합니다.');
       setOneLiner('');
       setRecommendedTrack('');
       setBody('');
       setExpansionNote('');
-      router.replace('/profile');
+      router.replace(`/albums/${albumId}`);
       router.refresh();
     } catch (error) {
       setStatus('error');

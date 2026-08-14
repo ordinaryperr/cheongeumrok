@@ -144,7 +144,10 @@ export default async function Home() {
               <div className="archiveAlbums">
                 {collection.albums.map((album) => (
                   <Link href={album.href || `/albums/${album.id}`} key={album.id}>
-                    <span>{album.coverUrl ? '' : album.title.slice(0, 1)}</span>
+                    <span
+                      className={album.coverUrl ? 'archiveAlbumCover imageCover' : 'archiveAlbumCover'}
+                      style={album.coverUrl ? { backgroundImage: `url(${album.coverUrl})` } : undefined}
+                    >{album.coverUrl ? '' : album.title.slice(0, 1)}</span>
                     <b>{album.title}</b>
                     <small>{album.artist}</small>
                   </Link>
