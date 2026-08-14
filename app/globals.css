@@ -1543,3 +1543,7 @@ blockquote { line-height: 1.7; }
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+.followingTagFilters {
+  margin-bottom: 6px;
+}

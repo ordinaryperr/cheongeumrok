@@ -3,7 +3,10 @@ import FollowingFeed from '../../components/FollowingFeed';
 
 export const metadata = { title: 'Following Feed | 청음록' };
 
-export default function FollowingPage() {
+export default async function FollowingPage({ searchParams }) {
+  const params = await searchParams;
+  const selectedTag = typeof params?.tag === 'string' ? params.tag : 'All';
+
   return (
     <main>
       <AppHeader />
@@ -17,7 +20,7 @@ export default function FollowingPage() {
         </div>
       </section>
       <section className="section topTight narrow">
-        <FollowingFeed />
+        <FollowingFeed selectedTag={selectedTag} />
       </section>
     </main>
   );
