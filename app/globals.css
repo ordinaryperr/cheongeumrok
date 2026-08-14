@@ -1547,3 +1547,15 @@ blockquote { line-height: 1.7; }
 .followingTagFilters {
   margin-bottom: 6px;
 }
+
+.archiveAlbums .archiveAlbumCover {
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.archiveAlbums .archiveAlbumCover.imageCover {
+  background-color: rgba(255,250,241,.72);
+  background-size: cover;
+  background-position: center;
+}
