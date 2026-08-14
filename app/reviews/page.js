@@ -40,6 +40,10 @@ export default async function ReviewsPage() {
         <p className="eyebrow">review feed</p>
         <h1>다른 사람의 청음 기록</h1>
         <p className="lead">Letterboxd처럼 다른 사람의 감상으로 음악을 발견하는 공간.</p>
+        <div className="feedTabs" aria-label="리뷰 피드 탭">
+          <a className="active" href="/reviews">All Reviews</a>
+          <a href="/following">Following</a>
+        </div>
       </section>
       <section className="section topTight narrow">
         {error ? <p className="empty">Supabase 피드를 불러오지 못해 더미 감상을 보여주고 있습니다.</p> : null}

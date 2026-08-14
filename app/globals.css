@@ -1361,3 +1361,38 @@ blockquote { line-height: 1.7; }
     width: 100%;
   }
 }
+
+.feedTabs {
+  display: inline-flex;
+  gap: 8px;
+  margin-top: 26px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255,250,241,.58);
+}
+.feedTabs a {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0 14px;
+  color: var(--muted);
+  font-family: 'Space Grotesk';
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.feedTabs a.active {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+@media (max-width: 420px) {
+  .feedTabs {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
