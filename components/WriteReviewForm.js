@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { musicTagSchema } from '../data/musicOntology';
-import { inferMusicTags } from '../lib/taste';
+import { inferMusicTags, normalizeMusicTagRecord } from '../lib/taste';
+import { syncUserTasteSignals } from '../lib/userTasteSignals';
 import { supabase } from '../lib/supabase';
 
 const scores = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
@@ -151,6 +152,27 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
         await upsertMusicTags({ albumId, trackId, tags: ontologyTags });
       } catch (tagError) {
         console.warn('music_tags 저장을 건너뜁니다:', tagError.message);
+      }
+
+      try {
+        const { data: userReviews } = await supabase
+          .from('reviews')
+          .select('id, rating, one_liner, body, created_at, album_id, track_id, albums:album_id(id, title, artist, release_date, album_type), tracks:track_id(id, title, artist)')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(150);
+        const { data: tagData } = await supabase
+          .from('music_tags')
+          .select('target_type, target_id, genre, mood, texture, era, difficulty, adjacent_genres');
+        const tagMap = new Map((tagData || []).map((tag) => [`${tag.target_type}:${tag.target_id}`, normalizeMusicTagRecord(tag)]));
+        const enrichedReviews = (userReviews || []).map((review) => ({
+          ...review,
+          musicTag: tagMap.get(`${review.track_id ? 'track' : 'album'}:${review.track_id || review.album_id}`) || null,
+        }));
+        const { error: tasteError } = await syncUserTasteSignals(user.id, enrichedReviews);
+        if (tasteError) console.warn('user_taste_signals 저장을 건너뜁니다:', tasteError.message);
+      } catch (tasteError) {
+        console.warn('user_taste_signals 갱신을 건너뜁니다:', tasteError.message);
       }
 
       setStatus('done');

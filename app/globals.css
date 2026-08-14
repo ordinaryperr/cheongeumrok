@@ -1430,3 +1430,48 @@ blockquote { line-height: 1.7; }
     grid-template-columns: 1fr;
   }
 }
+
+.evidenceSources {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+}
+.evidenceSources span {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255,255,255,.34);
+  padding: 7px 9px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+.evidenceSources b {
+  flex: 0 0 auto;
+  color: var(--accent-2);
+  font-family: 'Space Grotesk';
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.courseAlbums a small {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+.courseAlbums a em {
+  display: inline-flex;
+  margin-top: 8px;
+  color: var(--accent-2);
+  font-style: normal;
+  font-size: 11px;
+}
+
+@media (max-width: 520px) {
+  .evidenceSources span {
+    display: grid;
+    gap: 2px;
+  }
+}

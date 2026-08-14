@@ -5,6 +5,14 @@ import { curriculumTracks } from '../data/beyondYourFence';
 import { calculateLevelProgress, extractTasteSignals, normalizeMusicTagRecord, personalizeCurriculumTracks } from '../lib/taste';
 import { supabase } from '../lib/supabase';
 
+function buildEvidenceSources({ status, reviews }) {
+  return [
+    { label: 'Source', value: '청음록 편집 커리큘럼' },
+    { label: 'Based on', value: status === 'ready' ? `내 공개/비공개 기록 ${reviews.length}개` : '기본 장르 경로' },
+    { label: 'Signals', value: 'music_tags · 온톨로지 그래프 · 평점 가중치' },
+  ];
+}
+
 function buildAssignmentReason({ track, level, taste, status }) {
   if (status !== 'ready' || !taste?.top) {
     return `청음록 편집 커리큘럼 기준으로 ${track.genre}의 ${level.name} 단계에 배치된 과제입니다. 기록이 쌓이면 개인 취향 신호에 맞춰 이유가 더 구체화됩니다.`;
@@ -18,6 +26,28 @@ function buildAssignmentReason({ track, level, taste, status }) {
   const signalText = signals.length ? signals.join(', ') : 'your recent listening pattern';
 
   return `당신의 기록에서 ${signalText} 신호가 강하게 나타났습니다. 이 과제는 ${from}에서 ${track.genre}로 넘어가는 브리지 역할을 하며, ${level.name} 단계에 맞춰 익숙함보다 한 걸음 더 낯선 음악을 듣게 합니다.`;
+}
+
+function buildAlbumAssignmentReason({ album, track, level, taste, status }) {
+  const [artist, title] = String(album).split(' — ').map((item) => item?.trim()).filter(Boolean);
+  const levelFrame = {
+    Freshman: '입문 기준점을 만들기 위한 앨범입니다.',
+    Sophomore: '장르 안의 구조와 시대 차이를 비교하게 하는 앨범입니다.',
+    Junior: '하위 장르와 영향 관계를 더 정확히 듣게 하는 앨범입니다.',
+    Senior: '익숙한 취향을 흔드는 고난도 과제 앨범입니다.',
+  }[level.name] || '커리큘럼 기준 앨범입니다.';
+
+  if (status !== 'ready' || !taste?.top) {
+    return `${artist ? `${artist}의 ` : ''}${title || album}은 ${track.genre} ${level.name} 단계에서 ${levelFrame}`;
+  }
+
+  const strongest = [
+    ...(taste.top.mood || []),
+    ...(taste.top.texture || []),
+    ...(taste.top.genre || []),
+  ].find((item) => !['Unknown', 'unclassified'].includes(item.value));
+  const signal = strongest ? `${strongest.value} 신호` : '최근 기록의 취향 신호';
+  return `${signal}에서 바로 비슷한 음악으로 가지 않고 ${track.genre}의 다른 문법으로 이동하도록 고른 앨범입니다. ${levelFrame}`;
 }
 
 export default function BeyondCurriculumClient() {
@@ -99,6 +129,8 @@ export default function BeyondCurriculumClient() {
                 const cardStatus = unlocked ? 'open' : 'locked';
                 previousComplete = progress >= 100;
 
+                const sources = buildEvidenceSources({ status, reviews });
+
                 return (
                   <div className={`levelCard ${cardStatus}`} key={level.name}>
                     <div className="levelTop">
@@ -119,13 +151,20 @@ export default function BeyondCurriculumClient() {
                     <div className="assignmentReason">
                       <strong>Why this assignment?</strong>
                       <p>{buildAssignmentReason({ track, level, taste, status })}</p>
+                      <div className="evidenceSources">
+                        {sources.map((source) => (
+                          <span key={source.label}><b>{source.label}</b>{source.value}</span>
+                        ))}
+                        {computed ? <span><b>Progress evidence</b>{computed.exactGenreCount} genre · {computed.matchingDifficultyCount} difficulty · {computed.moodTextureCount} mood/texture</span> : null}
+                      </div>
                     </div>
 
                     <div className="courseAlbums">
                       {level.albums.map((album) => (
                         <a key={album} href={`/search?q=${encodeURIComponent(album)}`}>
                           <b>{album}</b>
-                          <small>Search / record this assignment →</small>
+                          <small>{buildAlbumAssignmentReason({ album, track, level, taste, status })}</small>
+                          <em>Search / record this assignment →</em>
                         </a>
                       ))}
                     </div>
