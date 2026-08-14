@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import AppHeader from '../../components/AppHeader';
 import BeyondCurriculumClient from '../../components/BeyondCurriculumClient';
 import BeyondPersonalization from '../../components/BeyondPersonalization';
@@ -45,7 +46,9 @@ export default function BeyondYourFencePage() {
       </section>
 
       <section className="section topTight curriculumSection">
-        <BeyondCurriculumClient />
+        <Suspense fallback={<p className="empty">Beyond 커리큘럼을 불러오는 중입니다.</p>}>
+          <BeyondCurriculumClient />
+        </Suspense>
       </section>
     </main>
   );

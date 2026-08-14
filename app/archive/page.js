@@ -38,17 +38,17 @@ function filterCollections(collections, { genre, q }) {
 function getBeyondRoute(collection) {
   const primary = collection.tags[0];
   const routes = {
-    Jazz: { href: '/beyond-your-fence#jazz', label: 'Freshman available' },
-    Ambient: { href: '/beyond-your-fence#ambient', label: 'Freshman available' },
-    'Post-Punk': { href: '/beyond-your-fence#post-punk', label: 'Freshman available' },
-    'Hip-Hop': { href: '/beyond-your-fence#hip-hop', label: 'Freshman available' },
-    Dubstep: { href: '/beyond-your-fence#dubstep', label: 'Freshman available' },
-    'R&B': { href: '/beyond-your-fence#rnb', label: 'Freshman available' },
-    Electronic: { href: '/beyond-your-fence#electronic', label: 'Freshman available' },
-    Shoegaze: { href: '/beyond-your-fence#shoegaze', label: 'Freshman available' },
-    Metal: { href: '/beyond-your-fence#metal', label: 'Freshman available' },
-    Experimental: { href: '/beyond-your-fence#experimental', label: 'Freshman available' },
-    Classical: { href: '/beyond-your-fence#classical-contemporary', label: 'Freshman available' },
+    Jazz: { href: '/beyond-your-fence?genre=jazz#jazz', label: 'Freshman available' },
+    Ambient: { href: '/beyond-your-fence?genre=ambient#ambient', label: 'Freshman available' },
+    'Post-Punk': { href: '/beyond-your-fence?genre=post-punk#post-punk', label: 'Freshman available' },
+    'Hip-Hop': { href: '/beyond-your-fence?genre=hip-hop#hip-hop', label: 'Freshman available' },
+    Dubstep: { href: '/beyond-your-fence?genre=dubstep#dubstep', label: 'Freshman available' },
+    'R&B': { href: '/beyond-your-fence?genre=r-and-b#r-and-b', label: 'Freshman available' },
+    Electronic: { href: '/beyond-your-fence?genre=electronic#electronic', label: 'Freshman available' },
+    Shoegaze: { href: '/beyond-your-fence?genre=shoegaze#shoegaze', label: 'Freshman available' },
+    Metal: { href: '/beyond-your-fence?genre=metal#metal', label: 'Freshman available' },
+    Experimental: { href: '/beyond-your-fence?genre=experimental#experimental', label: 'Freshman available' },
+    Classical: { href: '/beyond-your-fence?genre=classical-contemporary-classical#classical-contemporary-classical', label: 'Freshman available' },
   };
   return routes[primary] || { href: null, label: 'Coming soon' };
 }

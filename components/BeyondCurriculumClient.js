@@ -1,9 +1,20 @@
 'use client';
 
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { curriculumTracks } from '../data/beyondYourFence';
 import { calculateLevelProgress, extractTasteSignals, normalizeMusicTagRecord, personalizeCurriculumTracks } from '../lib/taste';
 import { supabase } from '../lib/supabase';
+
+function genreParam(value = '') {
+  return String(value).toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function buildBeyondHref(genre) {
+  const param = genreParam(genre);
+  return param ? `/beyond-your-fence?genre=${param}#${param}` : '/beyond-your-fence';
+}
 
 function buildEvidenceSources({ status, reviews }) {
   return [
@@ -51,6 +62,8 @@ function buildAlbumAssignmentReason({ album, track, level, taste, status }) {
 }
 
 export default function BeyondCurriculumClient() {
+  const searchParams = useSearchParams();
+  const selectedGenre = searchParams.get('genre') || 'all';
   const [reviews, setReviews] = useState([]);
   const [status, setStatus] = useState('loading');
 
@@ -104,14 +117,26 @@ export default function BeyondCurriculumClient() {
       : curriculumTracks
   ), [reviews, status, taste]);
 
+  const genreOptions = useMemo(() => [{ label: 'All', param: 'all' }, ...tracks.map((track) => ({ label: track.genre, param: genreParam(track.genre) }))], [tracks]);
+  const visibleTracks = useMemo(() => (
+    selectedGenre === 'all'
+      ? tracks
+      : tracks.filter((track) => genreParam(track.genre) === selectedGenre)
+  ), [selectedGenre, tracks]);
+
   return (
     <div className="curriculumList">
+      <div className="beyondGenreTabs" aria-label="Beyond 장르 필터">
+        {genreOptions.map((option) => (
+          <Link className={selectedGenre === option.param ? 'active' : ''} href={option.param === 'all' ? '/beyond-your-fence' : `/beyond-your-fence?genre=${option.param}#${option.param}`} key={option.param}>{option.label}</Link>
+        ))}
+      </div>
       {status === 'guest' ? <p className="empty">로그인하면 기록 기반으로 커리큘럼 순서와 진행도가 개인화됩니다.</p> : null}
-      {tracks.map((track) => {
+      {visibleTracks.length ? visibleTracks.map((track) => {
         let previousComplete = true;
 
         return (
-          <article className="curriculumTrack" id={track.id} key={track.id}>
+          <article className="curriculumTrack" id={genreParam(track.genre)} key={track.id}>
             <div className="trackIntro">
               <p className="eyebrow">{track.signal}</p>
               <h2>{track.genre}</h2>
@@ -191,7 +216,7 @@ export default function BeyondCurriculumClient() {
             </div>
           </article>
         );
-      })}
+      }) : <p className="empty">선택한 장르의 Beyond Route를 찾을 수 없습니다.</p>}
     </div>
   );
 }

@@ -1774,3 +1774,36 @@ blockquote { line-height: 1.7; }
 .curriculumTrack {
   scroll-margin-top: 110px;
 }
+
+.beyondGenreTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.beyondGenreTabs a {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255,250,241,.58);
+  padding: 0 12px;
+  color: var(--muted);
+  font-family: 'Space Grotesk';
+  font-size: 11px;
+  letter-spacing: .06em;
+}
+.beyondGenreTabs a.active {
+  border-color: var(--accent-2);
+  background: rgba(154,74,54,.12);
+  color: var(--accent-2);
+}
+
+@media (max-width: 640px) {
+  .beyondGenreTabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
