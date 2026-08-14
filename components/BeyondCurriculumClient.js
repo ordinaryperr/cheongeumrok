@@ -39,6 +39,14 @@ function buildAssignmentReason({ track, level, taste, status }) {
   return `당신의 기록에서 ${signalText} 신호가 강하게 나타났습니다. 이 과제는 ${from}에서 ${track.genre}로 넘어가는 브리지 역할을 하며, ${level.name} 단계에 맞춰 익숙함보다 한 걸음 더 낯선 음악을 듣게 합니다.`;
 }
 
+function buildProgressExplanation({ computed, level }) {
+  if (!computed) {
+    return '로그인 후 내 기록의 genre, difficulty, mood, texture 태그를 기준으로 진행도가 계산됩니다.';
+  }
+
+  return `${level.name} 통과 조건은 단순 기록 수만 보지 않습니다. 현재 증거는 장르 일치 ${computed.exactGenreCount}개, 난이도 충족 ${computed.matchingDifficultyCount}개, mood/texture 증거 ${computed.moodTextureCount}개, 인접 장르 ${computed.adjacentCount}개입니다.`;
+}
+
 function buildAlbumAssignmentReason({ album, track, level, taste, status }) {
   const [artist, title] = String(album).split(' — ').map((item) => item?.trim()).filter(Boolean);
   const levelFrame = {
@@ -66,6 +74,7 @@ export default function BeyondCurriculumClient() {
   const selectedGenre = searchParams.get('genre') || 'all';
   const [reviews, setReviews] = useState([]);
   const [status, setStatus] = useState('loading');
+  const [expandedTracks, setExpandedTracks] = useState(new Set());
 
   useEffect(() => {
     async function loadReviews() {
@@ -134,16 +143,34 @@ export default function BeyondCurriculumClient() {
       {status === 'guest' ? <p className="empty">로그인하면 기록 기반으로 커리큘럼 순서와 진행도가 개인화됩니다.</p> : null}
       {visibleTracks.length ? visibleTracks.map((track) => {
         let previousComplete = true;
+        const trackKey = genreParam(track.genre);
+        const forceExpanded = selectedGenre !== 'all';
+        const expanded = forceExpanded || expandedTracks.has(trackKey);
+        const levelsToShow = expanded ? track.levels : track.levels.slice(0, 1);
 
         return (
-          <article className="curriculumTrack" id={genreParam(track.genre)} key={track.id}>
+          <article className="curriculumTrack" id={trackKey} key={track.id}>
             <div className="trackIntro">
               <p className="eyebrow">{track.signal}</p>
               <h2>{track.genre}</h2>
               <p>{track.reason}</p>
+              {selectedGenre === 'all' ? (
+                <button
+                  type="button"
+                  className="routeToggleButton"
+                  onClick={() => setExpandedTracks((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(trackKey)) next.delete(trackKey);
+                    else next.add(trackKey);
+                    return next;
+                  })}
+                >
+                  {expanded ? 'Collapse route' : 'Show full route'}
+                </button>
+              ) : null}
             </div>
             <div className="levelGrid">
-              {track.levels.map((level, index) => {
+              {levelsToShow.map((level, index) => {
                 const computed = status === 'ready'
                   ? calculateLevelProgress({ track, level, reviews, previousComplete })
                   : null;
@@ -171,6 +198,11 @@ export default function BeyondCurriculumClient() {
                         <span>{progress}% complete</span>
                       </div>
                       <div className="progressBar"><i style={{ width: `${progress}%` }} /></div>
+                    </div>
+
+                    <div className="progressExplanation">
+                      <strong>How progress is judged</strong>
+                      <p>{buildProgressExplanation({ computed, level })}</p>
                     </div>
 
                     <div className="assignmentReason">
@@ -206,7 +238,7 @@ export default function BeyondCurriculumClient() {
                     </div>
 
                     {unlocked ? (
-                      <a className="semesterButton" href="/search">Start {level.name}</a>
+                      <a className="semesterButton" href={`/search?q=${encodeURIComponent(level.albums[0] || track.genre)}`}>Start {level.name} with first album</a>
                     ) : (
                       <div className="lockedHint">Complete {track.levels[index - 1]?.name || 'previous semester'} requirements to unlock.</div>
                     )}

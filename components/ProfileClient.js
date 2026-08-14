@@ -3,8 +3,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import EditableReviewCard from './EditableReviewCard';
-import { extractTasteSignals, normalizeMusicTagRecord } from '../lib/taste';
+import { curriculumTracks } from '../data/beyondYourFence';
+import { calculateLevelProgress, extractTasteSignals, normalizeMusicTagRecord } from '../lib/taste';
 import { supabase } from '../lib/supabase';
+
+function genreParam(value = '') {
+  return String(value).toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
 
 function formatTime(value) {
   if (!value) return '';
@@ -22,6 +27,7 @@ function mapReview(review) {
     body: review.body || '',
     musicTag: review.musicTag || null,
     text: review.one_liner || review.body || '감상을 남겼습니다.',
+    created_at: review.created_at,
     createdAt: formatTime(review.created_at),
     album: {
       id: target?.id || review.id,
@@ -126,6 +132,24 @@ export default function ProfileClient() {
   }, [reviews]);
 
   const tasteSignals = useMemo(() => extractTasteSignals(reviews), [reviews]);
+  const beyondSummary = useMemo(() => {
+    if (!reviews.length) return [];
+    return curriculumTracks.map((track) => {
+      const freshman = track.levels[0];
+      const progress = calculateLevelProgress({ track, level: freshman, reviews, previousComplete: true });
+      return {
+        id: genreParam(track.genre),
+        genre: track.genre,
+        completed: progress.completed,
+        total: progress.total,
+        progress: progress.progress,
+        relatedCount: progress.relatedCount,
+      };
+    })
+      .filter((item) => item.progress > 0 || item.relatedCount > 0)
+      .sort((a, b) => b.progress - a.progress || b.relatedCount - a.relatedCount)
+      .slice(0, 4);
+  }, [reviews]);
 
   if (status === 'loading') {
     return (
@@ -192,6 +216,18 @@ export default function ProfileClient() {
                 </div>
               ))}
             </div>
+            {beyondSummary.length ? (
+              <div className="profileBeyondSummary">
+                <p className="eyebrow">Beyond requirements</p>
+                {beyondSummary.map((route) => (
+                  <Link href={`/beyond-your-fence?genre=${route.id}#${route.id}`} key={route.id}>
+                    <b>{route.genre}</b>
+                    <span>{route.completed}/{route.total} checks · {route.progress}% Freshman</span>
+                    <i><em style={{ width: `${route.progress}%` }} /></i>
+                  </Link>
+                ))}
+              </div>
+            ) : null}
             <div className="profileActionRow">
               <Link className="semesterButton" href="/beyond-your-fence">Beyond Your Fence 보기</Link>
               <Link className="semesterButton secondarySemester" href="/following">팔로잉 피드 보기</Link>

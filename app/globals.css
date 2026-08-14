@@ -1807,3 +1807,81 @@ blockquote { line-height: 1.7; }
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+.routeToggleButton {
+  margin-top: 14px;
+  min-height: 38px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  padding: 0 14px;
+  font-family: 'Space Grotesk';
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.progressExplanation {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(45,74,62,.07);
+  padding: 12px;
+  margin: 12px 0;
+}
+.progressExplanation strong {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--accent-2);
+  font-family: 'Space Grotesk';
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.progressExplanation p {
+  color: var(--muted);
+  line-height: 1.55;
+  font-size: 13px;
+}
+.profileBeyondSummary {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+.profileBeyondSummary > a {
+  display: grid;
+  grid-template-columns: minmax(90px, auto) 1fr;
+  gap: 4px 10px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255,255,255,.32);
+  padding: 10px;
+}
+.profileBeyondSummary b {
+  color: var(--ink);
+  font-family: 'Space Grotesk';
+}
+.profileBeyondSummary span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.profileBeyondSummary i {
+  grid-column: 1 / -1;
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(45,36,26,.10);
+  overflow: hidden;
+}
+.profileBeyondSummary i em {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+}
+
+@media (max-width: 520px) {
+  .profileBeyondSummary > a {
+    grid-template-columns: 1fr;
+  }
+}
