@@ -1,4 +1,5 @@
 import AppHeader from '../../../../components/AppHeader';
+import { getCuratedAlbumFallbackById } from '../../../../data/curatedAlbumIds';
 import { getSpotifyAlbumTracks, getSpotifyItem } from '../../../../lib/spotify';
 import { inferMusicTags } from '../../../../lib/taste';
 
@@ -52,9 +53,19 @@ export default async function SpotifyAlbumPreviewPage({ params }) {
 
   try {
     album = await getSpotifyItem({ id, type: 'album' });
-    tracks = await getSpotifyAlbumTracks(id);
   } catch (error) {
-    errorMessage = error.message || '앨범 정보를 불러오지 못했습니다.';
+    album = getCuratedAlbumFallbackById(id);
+    errorMessage = album
+      ? 'Spotify API 제한으로 일부 정보는 청음록의 canonical 데이터로 표시합니다.'
+      : error.message || '앨범 정보를 불러오지 못했습니다.';
+  }
+
+  if (album) {
+    try {
+      tracks = await getSpotifyAlbumTracks(id);
+    } catch (error) {
+      errorMessage = errorMessage || 'Spotify API 제한으로 트랙 리스트는 잠시 숨겨졌습니다.';
+    }
   }
 
   if (!album) {
@@ -92,6 +103,7 @@ export default async function SpotifyAlbumPreviewPage({ params }) {
           <article className="albumDescriptionBox">
             <p className="eyebrow">album description</p>
             <p>{buildSpotifyAlbumDescription(album)}</p>
+            {errorMessage ? <p className="formMessage">{errorMessage}</p> : null}
           </article>
           {routeHint ? (
             <div className="albumRouteBox">

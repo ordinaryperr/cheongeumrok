@@ -111,9 +111,13 @@ export function getCuratedAlbumId(value) {
   return curatedAlbumIds[normalizeAlbumKey(value)] || null;
 }
 
+export function getCuratedAlbumFallbackById(id) {
+  const fallback = curatedAlbumFallbacks[id];
+  return fallback ? { id, type: 'album', year: fallback.year || '', releaseDate: fallback.year || '', totalTracks: null, externalUrl: `https://open.spotify.com/album/${id}`, ...fallback } : null;
+}
+
 export function getCuratedAlbumFallback(value) {
   const id = getCuratedAlbumId(value);
   if (!id) return null;
-  const fallback = curatedAlbumFallbacks[id];
-  return fallback ? { id, type: 'album', year: fallback.year || '', externalUrl: `https://open.spotify.com/album/${id}`, ...fallback } : null;
+  return getCuratedAlbumFallbackById(id);
 }
