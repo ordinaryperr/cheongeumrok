@@ -23,7 +23,7 @@ export const metadata = {
     description: '앨범과 곡에 별점과 감상을 남기고, 다른 사람의 청음 기록으로 취향을 넓혀보세요.',
     url: 'https://cheongeumrok.vercel.app',
     siteName: '청음록',
-    images: [{ url: '/og-image.svg', width: 1200, height: 630, alt: '청음록 - 음악 평점과 감상 기록' }],
+    images: [{ url: '/og-image.png', width: 1200, height: 1200, alt: '청음록 - 음악 평점과 감상 기록' }],
     locale: 'ko_KR',
     type: 'website',
   },
@@ -31,12 +31,12 @@ export const metadata = {
     card: 'summary_large_image',
     title: '청음록 | 음악을 듣고 기록하는 공간',
     description: '앨범과 곡에 별점과 감상을 남기고 나만의 청음 기록을 쌓아보세요.',
-    images: ['/og-image.svg'],
+    images: ['/og-image.png'],
   },
   icons: {
-    icon: [{ url: '/cheongeumrok-favicon-v6.png', type: 'image/png', sizes: '64x64' }],
-    shortcut: ['/cheongeumrok-favicon-v6.png'],
-    apple: [{ url: '/apple-touch-icon.png?v=4', sizes: '180x180', type: 'image/png' }],
+    icon: [{ url: '/cheongeumrok-favicon-v7.png', type: 'image/png', sizes: '64x64' }],
+    shortcut: ['/cheongeumrok-favicon-v7.png'],
+    apple: [{ url: '/apple-touch-icon.png?v=5', sizes: '180x180', type: 'image/png' }],
   },
 };
 
@@ -47,9 +47,9 @@ export default function RootLayout({ children }) {
         <meta name="theme-color" content="#17130f" />
         <meta name="mobile-web-app-capable" content="yes" />
         <link rel="manifest" href="/manifest.webmanifest" />
-        <link rel="icon" type="image/png" sizes="64x64" href="/cheongeumrok-favicon-v6.png" />
-        <link rel="shortcut icon" type="image/png" href="/cheongeumrok-favicon-v6.png" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=4" />
+        <link rel="icon" type="image/png" sizes="64x64" href="/cheongeumrok-favicon-v7.png" />
+        <link rel="shortcut icon" type="image/png" href="/cheongeumrok-favicon-v7.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=5" />
       </head>
       <body>
         <PwaRegister />
