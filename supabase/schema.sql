@@ -184,6 +184,7 @@ drop policy if exists "users can like as themselves" on public.review_likes;
 drop policy if exists "users can unlike as themselves" on public.review_likes;
 drop policy if exists "comments are readable" on public.review_comments;
 drop policy if exists "users can comment as themselves" on public.review_comments;
+drop policy if exists "users can update own review comments" on public.review_comments;
 drop policy if exists "users can delete own comments" on public.review_comments;
 drop policy if exists "album comments are readable" on public.album_comments;
 drop policy if exists "users can write album comments" on public.album_comments;
@@ -197,12 +198,25 @@ drop policy if exists "authenticated users can insert news" on public.news_posts
 drop policy if exists "authenticated users can update news" on public.news_posts;
 drop policy if exists "authenticated users can delete news" on public.news_posts;
 
+create or replace function public.is_admin()
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select coalesce((select profiles.is_admin from public.profiles where profiles.id = auth.uid()), false);
+$$;
+
 -- profiles policies
 create policy "profiles are readable by everyone"
 on public.profiles for select using (true);
 
 create policy "users can update own profile"
-on public.profiles for update using (auth.uid() = id);
+on public.profiles for update
+to authenticated
+using (auth.uid() = id)
+with check (auth.uid() = id);
 
 -- albums/tracks: 모두 읽기 가능, 로그인 유저가 캐시 생성 가능
 create policy "albums are readable by everyone"
@@ -228,93 +242,108 @@ create policy "public reviews are readable"
 on public.reviews for select using (is_public = true or auth.uid() = user_id);
 
 create policy "users can insert own reviews"
-on public.reviews for insert with check (auth.uid() = user_id);
+on public.reviews for insert
+to authenticated
+with check (auth.uid() = user_id);
 
 create policy "users can update own reviews"
-on public.reviews for update using (auth.uid() = user_id);
+on public.reviews for update
+to authenticated
+using (auth.uid() = user_id)
+with check (auth.uid() = user_id);
 
 create policy "users can delete own reviews"
-on public.reviews for delete using (auth.uid() = user_id);
+on public.reviews for delete
+to authenticated
+using (auth.uid() = user_id or public.is_admin());
 
 -- likes policies
 create policy "likes are readable"
 on public.review_likes for select using (true);
 
 create policy "users can like as themselves"
-on public.review_likes for insert with check (auth.uid() = user_id);
+on public.review_likes for insert
+to authenticated
+with check (auth.uid() = user_id);
 
 create policy "users can unlike as themselves"
-on public.review_likes for delete using (auth.uid() = user_id);
+on public.review_likes for delete
+to authenticated
+using (auth.uid() = user_id or public.is_admin());
 
 -- comments policies
 create policy "comments are readable"
 on public.review_comments for select using (true);
 
 create policy "users can comment as themselves"
-on public.review_comments for insert with check (auth.uid() = user_id);
+on public.review_comments for insert
+to authenticated
+with check (auth.uid() = user_id);
+
+create policy "users can update own review comments"
+on public.review_comments for update
+to authenticated
+using (auth.uid() = user_id)
+with check (auth.uid() = user_id);
 
 create policy "users can delete own comments"
-on public.review_comments for delete using (auth.uid() = user_id);
+on public.review_comments for delete
+to authenticated
+using (auth.uid() = user_id or public.is_admin());
 
 -- album comments policies
 create policy "album comments are readable"
 on public.album_comments for select using (true);
 
 create policy "users can write album comments"
-on public.album_comments for insert with check (auth.uid() = user_id);
+on public.album_comments for insert
+to authenticated
+with check (auth.uid() = user_id);
 
 create policy "users can update own album comments"
-on public.album_comments for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+on public.album_comments for update
+to authenticated
+using (auth.uid() = user_id)
+with check (auth.uid() = user_id);
 
 create policy "users can delete own album comments"
-on public.album_comments for delete using (auth.uid() = user_id);
+on public.album_comments for delete
+to authenticated
+using (auth.uid() = user_id or public.is_admin());
 
 -- follows policies
 create policy "follows are readable"
 on public.follows for select using (true);
 
 create policy "users can follow as themselves"
-on public.follows for insert with check (auth.uid() = follower_id);
+on public.follows for insert
+to authenticated
+with check (auth.uid() = follower_id and follower_id <> following_id);
 
 create policy "users can unfollow as themselves"
-on public.follows for delete using (auth.uid() = follower_id);
+on public.follows for delete
+to authenticated
+using (auth.uid() = follower_id or public.is_admin());
 
 -- news policies
 create policy "news is readable by everyone"
 on public.news_posts for select using (true);
 
 create policy "authenticated users can insert news"
-on public.news_posts for insert with check (
-  exists (
-    select 1 from public.profiles
-    where profiles.id = auth.uid()
-    and profiles.is_admin = true
-  )
-);
+on public.news_posts for insert
+to authenticated
+with check (public.is_admin());
 
 create policy "authenticated users can update news"
-on public.news_posts for update using (
-  exists (
-    select 1 from public.profiles
-    where profiles.id = auth.uid()
-    and profiles.is_admin = true
-  )
-) with check (
-  exists (
-    select 1 from public.profiles
-    where profiles.id = auth.uid()
-    and profiles.is_admin = true
-  )
-);
+on public.news_posts for update
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
 
 create policy "authenticated users can delete news"
-on public.news_posts for delete using (
-  exists (
-    select 1 from public.profiles
-    where profiles.id = auth.uid()
-    and profiles.is_admin = true
-  )
-);
+on public.news_posts for delete
+to authenticated
+using (public.is_admin());
 
 -- MVP용 샘플 뉴스
 insert into public.news_posts (title, summary, source, category)

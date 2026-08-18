@@ -29,31 +29,69 @@ create table if not exists public.user_taste_signals (
 alter table public.music_tags enable row level security;
 alter table public.user_taste_signals enable row level security;
 
+create or replace function public.is_admin()
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select coalesce((select profiles.is_admin from public.profiles where profiles.id = auth.uid()), false);
+$$;
+
+create or replace function public.user_has_review_for_music_tag(target_type text, target_id uuid)
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists (
+    select 1
+    from public.reviews
+    where reviews.user_id = auth.uid()
+      and (
+        (target_type = 'album' and reviews.album_id = target_id)
+        or
+        (target_type = 'track' and reviews.track_id = target_id)
+      )
+  );
+$$;
+
 drop policy if exists "Public music tags are readable" on public.music_tags;
 drop policy if exists "Authenticated users can write music tags" on public.music_tags;
 drop policy if exists "Authenticated users can update music tags" on public.music_tags;
+drop policy if exists "Authenticated users can write music tags for reviewed targets" on public.music_tags;
+drop policy if exists "Authenticated users can update music tags for reviewed targets" on public.music_tags;
+drop policy if exists "Admins can delete music tags" on public.music_tags;
 drop policy if exists "Users can read own taste signals" on public.user_taste_signals;
 drop policy if exists "Users can write own taste signals" on public.user_taste_signals;
 drop policy if exists "Users can update own taste signals" on public.user_taste_signals;
+drop policy if exists "Users can delete own taste signals" on public.user_taste_signals;
 
 create policy "Public music tags are readable"
   on public.music_tags for select
   using (true);
 
-create policy "Authenticated users can write music tags"
+create policy "Authenticated users can write music tags for reviewed targets"
   on public.music_tags for insert
   to authenticated
-  with check (true);
+  with check (public.user_has_review_for_music_tag(target_type, target_id) or public.is_admin());
 
-create policy "Authenticated users can update music tags"
+create policy "Authenticated users can update music tags for reviewed targets"
   on public.music_tags for update
   to authenticated
-  using (true)
-  with check (true);
+  using (public.user_has_review_for_music_tag(target_type, target_id) or public.is_admin())
+  with check (public.user_has_review_for_music_tag(target_type, target_id) or public.is_admin());
+
+create policy "Admins can delete music tags"
+  on public.music_tags for delete
+  to authenticated
+  using (public.is_admin());
 
 create policy "Users can read own taste signals"
   on public.user_taste_signals for select
-  using (auth.uid() = user_id);
+  using (auth.uid() = user_id or public.is_admin());
 
 create policy "Users can write own taste signals"
   on public.user_taste_signals for insert
@@ -65,3 +103,8 @@ create policy "Users can update own taste signals"
   to authenticated
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
+
+create policy "Users can delete own taste signals"
+  on public.user_taste_signals for delete
+  to authenticated
+  using (auth.uid() = user_id or public.is_admin());
