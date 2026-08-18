@@ -18,13 +18,28 @@ export default function AlbumComments({ albumId, initialComments = [] }) {
   useEffect(() => {
     if (!supabase) return;
 
-    supabase.auth.getUser().then(({ data }) => setUser(data.user || null));
+    async function loadUserAndProfiles() {
+      const { data } = await supabase.auth.getUser();
+      const currentUser = data.user || null;
+      setUser(currentUser);
+
+      const profileIds = Array.from(new Set((initialComments || []).map((comment) => comment.userId).filter(Boolean)));
+      if (!profileIds.length) return;
+      const { data: profiles } = await supabase.from('profiles').select('id, username, display_name').in('id', profileIds);
+      const profileMap = new Map((profiles || []).map((profile) => [profile.id, profile.display_name || profile.username || profile.id.slice(0, 8)]));
+      setComments((items) => items.map((comment) => ({
+        ...comment,
+        user: comment.userId === currentUser?.id ? 'me' : profileMap.get(comment.userId) || comment.user,
+      })));
+    }
+
+    loadUserAndProfiles();
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null);
     });
 
     return () => listener.subscription.unsubscribe();
-  }, []);
+  }, [initialComments]);
 
   async function handleSubmit(event) {
     event.preventDefault();

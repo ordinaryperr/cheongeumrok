@@ -71,6 +71,9 @@ export const curatedAlbumIds = {
   [normalizeAlbumKey('Metallica Master of Puppets')]: '2Lq2qX3hYhiuPckC8Flj21',
   [normalizeAlbumKey('Deftones — White Pony')]: '5LEXck3kfixFaA3CqVE7bC',
   [normalizeAlbumKey('Deftones White Pony')]: '5LEXck3kfixFaA3CqVE7bC',
+
+  [normalizeAlbumKey('Björk — Vespertine')]: '7sScYIMy44GyOll7TpWcak',
+  [normalizeAlbumKey('Björk Vespertine')]: '7sScYIMy44GyOll7TpWcak',
 };
 
 const curatedAlbumFallbacks = {
@@ -101,6 +104,7 @@ const curatedAlbumFallbacks = {
   '4kA2o0L3tz9vFKJetiFUJI': { title: 'Paranoid', artist: 'Black Sabbath', coverUrl: 'https://i.scdn.co/image/ab67616d0000b273605b25c031f809d78054a13c' },
   '2Lq2qX3hYhiuPckC8Flj21': { title: 'Master Of Puppets', artist: 'Metallica', coverUrl: 'https://i.scdn.co/image/ab67616d0000b273668e3aca3167e6e569a9aa20' },
   '5LEXck3kfixFaA3CqVE7bC': { title: 'White Pony', artist: 'Deftones', coverUrl: 'https://i.scdn.co/image/ab67616d0000b2735c53799f473fa3e1a48c00ed' },
+  '7sScYIMy44GyOll7TpWcak': { title: 'Vespertine', artist: 'Björk', year: '2001', coverUrl: 'https://i.scdn.co/image/ab67616d0000b2735c081511ab5779f399233349' },
 };
 
 export function getCuratedAlbumId(value) {
@@ -111,5 +115,5 @@ export function getCuratedAlbumFallback(value) {
   const id = getCuratedAlbumId(value);
   if (!id) return null;
   const fallback = curatedAlbumFallbacks[id];
-  return fallback ? { id, type: 'album', year: '', externalUrl: `https://open.spotify.com/album/${id}`, ...fallback } : null;
+  return fallback ? { id, type: 'album', year: fallback.year || '', externalUrl: `https://open.spotify.com/album/${id}`, ...fallback } : null;
 }

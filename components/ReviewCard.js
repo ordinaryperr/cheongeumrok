@@ -49,9 +49,19 @@ export default function ReviewCard({ review }) {
           .limit(6),
       ]);
 
+      const profileIds = Array.from(new Set((commentData || []).map((comment) => comment.user_id).filter(Boolean)));
+      const { data: profileData } = profileIds.length
+        ? await supabase.from('profiles').select('id, username, display_name').in('id', profileIds)
+        : { data: [] };
+      const profileMap = new Map((profileData || []).map((profile) => [profile.id, profile.display_name || profile.username || profile.id.slice(0, 8)]));
+      const enrichedComments = (commentData || []).map((comment) => ({
+        ...comment,
+        user: comment.user_id === currentUser?.id ? 'me' : profileMap.get(comment.user_id) || comment.user_id?.slice(0, 8) || 'listener',
+      }));
+
       if (!mounted) return;
       setLikeCount(count || 0);
-      setComments(commentData || []);
+      setComments(enrichedComments);
 
       if (currentUser) {
         const { data: likeData } = await supabase
@@ -147,7 +157,7 @@ export default function ReviewCard({ review }) {
     if (error) {
       setMessage(error.message);
     } else {
-      setComments((items) => [...items, data]);
+      setComments((items) => [...items, { ...data, user: currentUser.email?.split('@')[0] || 'me' }]);
       setCommentBody('');
       setCommentOpen(true);
     }
@@ -194,7 +204,7 @@ export default function ReviewCard({ review }) {
           <div className="commentThread">
             {comments.length ? comments.map((comment) => (
               <div className="inlineComment" key={comment.id}>
-                <b>{comment.user_id === user?.id ? 'me' : 'listener'}</b>
+                <b>{comment.user || (comment.user_id === user?.id ? 'me' : 'listener')}</b>
                 <span>{formatCommentTime(comment.created_at)}</span>
                 <p>{comment.body}</p>
                 {comment.user_id === user?.id ? <button type="button" onClick={() => handleDeleteComment(comment.id)} disabled={status === 'saving'}>삭제</button> : null}
