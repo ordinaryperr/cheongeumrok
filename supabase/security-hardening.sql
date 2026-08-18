@@ -175,7 +175,9 @@ with check (auth.uid() = id);
 alter table public.music_tags enable row level security;
 drop policy if exists "Public music tags are readable" on public.music_tags;
 drop policy if exists "Authenticated users can write music tags" on public.music_tags;
+drop policy if exists "Authenticated users can write music tags for reviewed targets" on public.music_tags;
 drop policy if exists "Authenticated users can update music tags" on public.music_tags;
+drop policy if exists "Authenticated users can update music tags for reviewed targets" on public.music_tags;
 drop policy if exists "Admins can delete music tags" on public.music_tags;
 
 create policy "Public music tags are readable"
