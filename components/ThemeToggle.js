@@ -16,12 +16,14 @@ export default function ThemeToggle() {
     const nextTheme = getInitialTheme();
     setTheme(nextTheme);
     document.documentElement.dataset.theme = nextTheme;
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', nextTheme === 'dark' ? '#0f0d0b' : '#f5f0e8');
   }, []);
 
   function toggleTheme() {
     const nextTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(nextTheme);
     document.documentElement.dataset.theme = nextTheme;
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', nextTheme === 'dark' ? '#0f0d0b' : '#f5f0e8');
     window.localStorage.setItem('cheongeumrok-theme', nextTheme);
   }
 
@@ -32,6 +34,7 @@ export default function ThemeToggle() {
       onClick={toggleTheme}
       aria-label={theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
       title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+      aria-pressed={theme === 'dark'}
     >
       <span aria-hidden="true">{theme === 'dark' ? '☀' : '☾'}</span>
       <span className="themeToggleText">{theme === 'dark' ? 'Light' : 'Dark'}</span>

@@ -2279,3 +2279,124 @@ blockquote { line-height: 1.7; }
   .themeToggleText { display: none; }
   .themeToggle { padding-inline: 10px; }
 }
+
+/* Dark mode polish pass: cover deeper surfaces and interaction states. */
+:root[data-theme='dark'] ::selection {
+  background: rgba(230,160,109,.34);
+  color: var(--ink);
+}
+:root[data-theme='dark'] .pageHero,
+:root[data-theme='dark'] .section {
+  color: var(--ink);
+}
+:root[data-theme='dark'] .reviewCard,
+:root[data-theme='dark'] .albumCard,
+:root[data-theme='dark'] .spotifyResultCard,
+:root[data-theme='dark'] .selectedMusicCard,
+:root[data-theme='dark'] .newsCard,
+:root[data-theme='dark'] .pillarCard,
+:root[data-theme='dark'] .archiveCard,
+:root[data-theme='dark'] .ratingPanel div,
+:root[data-theme='dark'] .commentCard,
+:root[data-theme='dark'] .commentComposer,
+:root[data-theme='dark'] .writeFlow div,
+:root[data-theme='dark'] .steps div,
+:root[data-theme='dark'] .gradeRail div,
+:root[data-theme='dark'] .curriculumTrack,
+:root[data-theme='dark'] .levelCard,
+:root[data-theme='dark'] .progressExplanation,
+:root[data-theme='dark'] .assignmentReason,
+:root[data-theme='dark'] .profileTastePanel,
+:root[data-theme='dark'] .followBox,
+:root[data-theme='dark'] .albumRouteBox,
+:root[data-theme='dark'] .searchContextBox,
+:root[data-theme='dark'] .reviewDetailMasthead,
+:root[data-theme='dark'] .reviewLongform,
+:root[data-theme='dark'] .reviewOntologyBox,
+:root[data-theme='dark'] .relatedReviewBox,
+:root[data-theme='dark'] .albumDescriptionBox,
+:root[data-theme='dark'] .albumTrackList {
+  background: var(--surface) !important;
+  border-color: var(--line) !important;
+  box-shadow: 0 22px 70px var(--shadow);
+}
+:root[data-theme='dark'] .archiveCard,
+:root[data-theme='dark'] .pillarCard {
+  background: linear-gradient(180deg, rgba(36,30,25,.82), rgba(29,24,20,.58)) !important;
+}
+:root[data-theme='dark'] .archiveAlbums a,
+:root[data-theme='dark'] .quickRating span,
+:root[data-theme='dark'] .ratingChoices button,
+:root[data-theme='dark'] .authTabs button,
+:root[data-theme='dark'] .beyondManifesto span,
+:root[data-theme='dark'] .levelTop em,
+:root[data-theme='dark'] .reviewActions a,
+:root[data-theme='dark'] .reviewActions button,
+:root[data-theme='dark'] .tags span,
+:root[data-theme='dark'] .tags em,
+:root[data-theme='dark'] .reviewTagChips span,
+:root[data-theme='dark'] .beyondBadgeShelf span,
+:root[data-theme='dark'] .archiveJumpList a,
+:root[data-theme='dark'] .archiveRouteBox,
+:root[data-theme='dark'] .archiveMoreAlbums a,
+:root[data-theme='dark'] .inlineComment,
+:root[data-theme='dark'] .inlineCommentForm,
+:root[data-theme='dark'] .tagSelectGrid label {
+  background: var(--surface-soft) !important;
+  border-color: var(--line) !important;
+  color: var(--muted);
+}
+:root[data-theme='dark'] .authTabs button.selected,
+:root[data-theme='dark'] .ratingChoices button.selected,
+:root[data-theme='dark'] .beyondGenreTabs a.active,
+:root[data-theme='dark'] .gradeRail div.active,
+:root[data-theme='dark'] .levelCard.open .levelTop em {
+  border-color: rgba(230,160,109,.58) !important;
+  color: var(--accent-2) !important;
+  background: rgba(230,160,109,.12) !important;
+}
+:root[data-theme='dark'] .searchBox button,
+:root[data-theme='dark'] .commentComposer button,
+:root[data-theme='dark'] .writeForm button[type='submit'],
+:root[data-theme='dark'] .inlineCommentForm button,
+:root[data-theme='dark'] .inlineEditForm button {
+  background: var(--ink);
+  color: #17130f;
+  border-color: var(--ink);
+}
+:root[data-theme='dark'] .searchBox button:disabled,
+:root[data-theme='dark'] button:disabled {
+  opacity: .42;
+}
+:root[data-theme='dark'] .levelCard.locked::after {
+  color: rgba(247,239,227,.13);
+}
+:root[data-theme='dark'] .cover,
+:root[data-theme='dark'] .miniCover,
+:root[data-theme='dark'] .archiveAlbums span,
+:root[data-theme='dark'] .archiveAlbumCover,
+:root[data-theme='dark'] .spotifyCover {
+  background-color: #2a211a;
+}
+:root[data-theme='dark'] .progressBar {
+  background: rgba(255,250,241,.10);
+}
+:root[data-theme='dark'] .progressBar i {
+  background: linear-gradient(90deg, var(--accent-2), var(--accent));
+}
+:root[data-theme='dark'] .textLink:hover,
+:root[data-theme='dark'] nav a:hover,
+:root[data-theme='dark'] .reviewActions a:hover,
+:root[data-theme='dark'] .reviewActions button:hover {
+  color: var(--accent-2);
+}
+:root[data-theme='dark'] .siteHeader {
+  border-bottom-color: rgba(247,239,227,.12);
+}
+:root[data-theme='dark'] .logo {
+  color: var(--ink);
+}
+:root[data-theme='dark'] .themeToggle[aria-pressed='true'] {
+  border-color: rgba(230,160,109,.55);
+  color: var(--accent-2);
+}

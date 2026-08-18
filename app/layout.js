@@ -46,10 +46,10 @@ export default function RootLayout({ children }) {
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('cheongeumrok-theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.dataset.theme=t;}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('cheongeumrok-theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.dataset.theme=t;var m=document.querySelector('meta[name="theme-color"]');if(m){m.setAttribute('content',t==='dark'?'#0f0d0b':'#f5f0e8')}}catch(e){}})();`, 
           }}
         />
-        <meta name="theme-color" content="#17130f" />
+        <meta name="theme-color" content="#f5f0e8" />
         <meta name="mobile-web-app-capable" content="yes" />
         <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="icon" type="image/png" sizes="64x64" href="/cheongeumrok-favicon-v7.png?v=2" />
