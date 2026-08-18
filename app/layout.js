@@ -44,6 +44,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="ko">
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('cheongeumrok-theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.dataset.theme=t;}catch(e){}})();`,
+          }}
+        />
         <meta name="theme-color" content="#17130f" />
         <meta name="mobile-web-app-capable" content="yes" />
         <link rel="manifest" href="/manifest.webmanifest" />

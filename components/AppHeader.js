@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import AuthNav from './AuthNav';
+import ThemeToggle from './ThemeToggle';
 
 export default function AppHeader() {
   return (
@@ -17,6 +18,7 @@ export default function AppHeader() {
         <Link href="/beyond-your-fence">Beyond</Link>
         <Link href="/profile">My Records</Link>
         <Link href="/write">Write</Link>
+        <ThemeToggle />
         <AuthNav />
       </nav>
     </header>
