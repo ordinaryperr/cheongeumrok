@@ -77,6 +77,7 @@ export default async function Home() {
       <AppHeader />
 
       <section className="hero">
+        <div className="homeHeroImage" aria-hidden="true" />
         <p className="eyebrow">music diary · ratings · reviews</p>
         <h1>익숙한 음악 너머로<br />취향의 울타리를 넓히는 곳.</h1>
         <p className="lead heroStatement">
