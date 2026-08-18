@@ -2442,3 +2442,32 @@ blockquote { line-height: 1.7; }
     padding: 42px 18px;
   }
 }
+
+/* Dark mode Beyond hero final correction: remove washed-out block. */
+:root[data-theme='dark'] .beyondPage {
+  background:
+    radial-gradient(circle at 18% 14%, rgba(230,160,109,.12), transparent 28%),
+    radial-gradient(circle at 84% 4%, rgba(159,199,181,.10), transparent 26%),
+    linear-gradient(135deg, #0f0d0b, #17130f 54%, #110e0c) !important;
+}
+:root[data-theme='dark'] .beyondHero {
+  max-width: 1180px;
+  margin: 0 auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent !important;
+  box-shadow: none;
+}
+:root[data-theme='dark'] .beyondHero h1 {
+  color: #fff8ec;
+}
+:root[data-theme='dark'] .beyondHero .lead {
+  color: rgba(247,239,227,.70);
+  max-width: 760px;
+}
+:root[data-theme='dark'] .beyondHero .primary,
+:root[data-theme='dark'] .beyondHero .secondary {
+  background: #fff8ec;
+  color: #17130f;
+  border-color: #fff8ec;
+}
