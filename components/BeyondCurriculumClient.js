@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { curriculumTracks } from '../data/beyondYourFence';
+import { getCuratedAlbumId } from '../data/curatedAlbumIds';
 import { calculateLevelProgress, extractTasteSignals, normalizeMusicTagRecord, personalizeCurriculumTracks } from '../lib/taste';
 import { supabase } from '../lib/supabase';
 
@@ -45,6 +46,11 @@ function buildProgressExplanation({ computed, level }) {
   }
 
   return `${level.name} 통과 조건은 단순 기록 수만 보지 않습니다. 현재 증거는 장르 일치 ${computed.exactGenreCount}개, 난이도 충족 ${computed.matchingDifficultyCount}개, mood/texture 증거 ${computed.moodTextureCount}개, 인접 장르 ${computed.adjacentCount}개입니다.`;
+}
+
+function buildAlbumHref(album) {
+  const curatedId = getCuratedAlbumId(album);
+  return curatedId ? `/albums/spotify/${curatedId}` : `/search?q=${encodeURIComponent(album)}`;
 }
 
 function buildAlbumAssignmentReason({ album, track, level, taste, status }) {
@@ -218,7 +224,7 @@ export default function BeyondCurriculumClient() {
 
                     <div className="courseAlbums">
                       {level.albums.map((album) => (
-                        <a key={album} href={`/search?q=${encodeURIComponent(album)}`}>
+                        <a key={album} href={buildAlbumHref(album)}>
                           <b>{album}</b>
                           <small>{buildAlbumAssignmentReason({ album, track, level, taste, status })}</small>
                           <em>Search / record this assignment →</em>
