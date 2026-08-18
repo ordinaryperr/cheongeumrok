@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import AppHeader from '../../../components/AppHeader';
 import ReviewCard from '../../../components/ReviewCard';
-import { parseOntologyTags } from '../../../lib/taste';
+import ReportButton from '../../../components/ReportButton';
+import { inferMusicTags, parseOntologyTags } from '../../../lib/taste';
 import { supabase } from '../../../lib/supabase';
 
 export const dynamic = 'force-dynamic';
@@ -36,6 +37,18 @@ function mapReview(review) {
   };
 }
 
+function genreParam(value = '') {
+  return String(value).toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function getRouteHint(review) {
+  const tags = inferMusicTags({ title: review.album.title, artist: review.album.artist, body: review.rawBody });
+  const genre = tags.genre?.find((item) => !['Unknown', 'unclassified'].includes(item));
+  if (!genre) return null;
+  const param = genreParam(genre);
+  return { genre, href: `/beyond-your-fence?genre=${param}#${param}` };
+}
+
 async function getReview(id) {
   if (!supabase) return null;
 
@@ -60,12 +73,33 @@ async function getReview(id) {
   return data;
 }
 
+async function getSiblingReviews(review) {
+  if (!supabase || !review?.album_id) return [];
+  const { data } = await supabase
+    .from('reviews')
+    .select('id, user_id, rating, one_liner, body, created_at, albums:album_id (id, title, artist, cover_url), tracks:track_id (id, title, artist, albums:album_id (cover_url))')
+    .eq('album_id', review.album_id)
+    .eq('is_public', true)
+    .neq('id', review.id)
+    .order('created_at', { ascending: false })
+    .limit(3);
+  return data || [];
+}
+
 export async function generateMetadata({ params }) {
   const { id } = await params;
   const data = await getReview(id);
   if (!data) return { title: '리뷰 | 청음록' };
   const review = mapReview(data);
-  return { title: `${review.album.title} 리뷰 | 청음록`, description: review.text };
+  return {
+    title: `${review.album.title} 리뷰 | 청음록`,
+    description: review.text,
+    openGraph: {
+      title: `${review.album.title} 리뷰 | 청음록`,
+      description: review.text,
+      images: review.album.coverUrl ? [{ url: review.album.coverUrl, alt: review.album.title }] : undefined,
+    },
+  };
 }
 
 export default async function ReviewDetailPage({ params }) {
@@ -89,7 +123,9 @@ export default async function ReviewDetailPage({ params }) {
   }
 
   const review = mapReview(data);
+  const siblingReviews = (await getSiblingReviews(data)).map(mapReview);
   const tags = parseOntologyTags(review.rawBody);
+  const routeHint = getRouteHint(review);
   const tagEntries = [
     ['genre', tags.genre],
     ['mood', tags.mood],
@@ -101,13 +137,18 @@ export default async function ReviewDetailPage({ params }) {
   return (
     <main>
       <AppHeader />
-      <section className="pageHero reviewDetailHero">
-        <p className="eyebrow">review detail</p>
-        <h1>{review.album.title}</h1>
-        <p className="lead">{review.album.artist}에 남겨진 하나의 청음 기록입니다. 별점, 문장, 댓글이 모여 음악에 대한 대화가 됩니다.</p>
-        <div className="heroActions">
-          <Link className="primary" href={`/albums/${review.album.id}`}>앨범 페이지</Link>
-          <Link className="secondary" href="/reviews">리뷰 피드</Link>
+      <section className="reviewDetailMasthead">
+        {review.album.coverUrl ? <div className="reviewDetailCover imageCover" style={{ backgroundImage: `url(${review.album.coverUrl})` }} /> : <div className="reviewDetailCover"><span>{review.album.title.slice(0, 1)}</span></div>}
+        <div>
+          <p className="eyebrow">review detail</p>
+          <h1>{review.album.title}</h1>
+          <p className="lead">{review.album.artist}에 남겨진 하나의 청음 기록입니다. 별점, 문장, 댓글이 모여 음악에 대한 대화가 됩니다.</p>
+          <p className="stars large">{'★'.repeat(Math.floor(review.rating))}{review.rating % 1 ? '½' : ''} <span>{review.rating.toFixed(1)} · @{review.user} · {review.createdAt}</span></p>
+          <div className="heroActions">
+            <Link className="primary" href={`/albums/${review.album.id}`}>앨범 페이지</Link>
+            <Link className="secondary" href="/reviews">리뷰 피드</Link>
+            <ReportButton targetType="review" targetId={review.id} />
+          </div>
         </div>
       </section>
 
@@ -118,6 +159,14 @@ export default async function ReviewDetailPage({ params }) {
           <article className="reviewLongform">
             <p className="eyebrow">full note</p>
             <p>{review.body}</p>
+          </article>
+        ) : null}
+
+        {routeHint ? (
+          <article className="albumRouteBox">
+            <span>Archive / Beyond Route</span>
+            <b>{routeHint.genre} Route와 연결될 수 있는 리뷰입니다.</b>
+            <Link href={routeHint.href}>Beyond에서 보기 →</Link>
           </article>
         ) : null}
 
@@ -138,6 +187,14 @@ export default async function ReviewDetailPage({ params }) {
                 </div>
               ) : null}
             </div>
+          </article>
+        ) : null}
+
+        {siblingReviews.length ? (
+          <article className="relatedReviewBox">
+            <p className="eyebrow">same album</p>
+            <h2>같은 앨범의 다른 감상</h2>
+            <div className="feedList">{siblingReviews.map((item) => <ReviewCard key={item.id} review={item} />)}</div>
           </article>
         ) : null}
       </section>

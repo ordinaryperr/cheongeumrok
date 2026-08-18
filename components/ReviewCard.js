@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import ReportButton from './ReportButton';
 import { parseOntologyTags } from '../lib/taste';
 import { supabase } from '../lib/supabase';
 
@@ -185,6 +186,7 @@ export default function ReviewCard({ review }) {
           <button type="button" onClick={() => setCommentOpen((open) => !open)} disabled={!canInteract}>댓글 {comments.length || review.commentCount || 0}</button>
           {canInteract ? <Link href={`/reviews/${review.id}`}>리뷰 보기</Link> : null}
           <Link href={`/albums/${review.album.id}`}>앨범 보기</Link>
+          {canInteract ? <ReportButton targetType="review" targetId={review.id} /> : null}
         </div>
         {!canInteract ? <p className="socialMessage">샘플 리뷰는 좋아요/댓글을 사용할 수 없습니다.</p> : null}
         {message ? <p className="socialMessage">{message}</p> : null}
