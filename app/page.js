@@ -79,12 +79,12 @@ export default async function Home() {
       <section className="hero">
         <p className="eyebrow">music diary · ratings · reviews</p>
         <h1>익숙한 음악 너머로<br />취향의 울타리를 넓히는 곳.</h1>
-        <p className="lead">
-          청음록은 음악을 검색해 감상을 남기고, 기록된 취향 신호를 바탕으로 Beyond 커리큘럼까지 이어지는 음악 기록 서비스입니다.
+        <p className="lead heroStatement">
+          기록은 출석이고, 감상은 취향의 지도입니다. 청음록은 당신이 들은 음악을 바탕으로 울타리 밖의 앨범을 과제로 제시합니다.
         </p>
+        <div className="heroMantra">Not recommendations. Assignments.</div>
         <div className="heroActions">
           <Link href="/search" className="primary">첫 음악 기록하기</Link>
-          <Link href="/archive" className="secondary">좋은 음악 아카이브</Link>
           <Link href="/beyond-your-fence" className="secondary">Beyond 시작하기</Link>
         </div>
         <div className="homeFocusGrid" aria-label="청음록 핵심 흐름">
