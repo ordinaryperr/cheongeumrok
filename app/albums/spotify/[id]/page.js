@@ -1,5 +1,5 @@
 import AppHeader from '../../../../components/AppHeader';
-import { getSpotifyItem } from '../../../../lib/spotify';
+import { getSpotifyAlbumTracks, getSpotifyItem } from '../../../../lib/spotify';
 import { inferMusicTags } from '../../../../lib/taste';
 
 export const dynamic = 'force-dynamic';
@@ -48,9 +48,11 @@ export default async function SpotifyAlbumPreviewPage({ params }) {
   const { id } = await params;
   let album = null;
   let errorMessage = '';
+  let tracks = [];
 
   try {
     album = await getSpotifyItem({ id, type: 'album' });
+    tracks = await getSpotifyAlbumTracks(id);
   } catch (error) {
     errorMessage = error.message || '앨범 정보를 불러오지 못했습니다.';
   }
@@ -97,6 +99,18 @@ export default async function SpotifyAlbumPreviewPage({ params }) {
               <b>{routeHint.genre} Freshman Route와 연결될 수 있습니다.</b>
               <a href={routeHint.href}>Beyond에서 보기 →</a>
             </div>
+          ) : null}
+          {tracks.length ? (
+            <article className="albumTrackList">
+              <p className="eyebrow">track list</p>
+              {tracks.slice(0, 12).map((track) => (
+                <a href={track.externalUrl || album.externalUrl || '#'} target="_blank" rel="noreferrer" key={track.id}>
+                  <span>{track.trackNumber || '•'}</span>
+                  <b>{track.title}</b>
+                  <small>{track.artist}</small>
+                </a>
+              ))}
+            </article>
           ) : null}
           <div className="heroActions">
             <a className="primary" href={getWriteHref(album)}>이 앨범 기록하기</a>
