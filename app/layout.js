@@ -34,9 +34,9 @@ export const metadata = {
     images: ['/og-image.png'],
   },
   icons: {
-    icon: [{ url: '/cheongeumrok-favicon-v7.png', type: 'image/png', sizes: '64x64' }],
-    shortcut: ['/cheongeumrok-favicon-v7.png'],
-    apple: [{ url: '/apple-touch-icon.png?v=5', sizes: '180x180', type: 'image/png' }],
+    icon: [{ url: '/cheongeumrok-favicon-v7.png?v=2', type: 'image/png', sizes: '64x64' }],
+    shortcut: ['/cheongeumrok-favicon-v7.png?v=2'],
+    apple: [{ url: '/apple-touch-icon.png?v=6', sizes: '180x180', type: 'image/png' }],
   },
 };
 
@@ -47,9 +47,9 @@ export default function RootLayout({ children }) {
         <meta name="theme-color" content="#17130f" />
         <meta name="mobile-web-app-capable" content="yes" />
         <link rel="manifest" href="/manifest.webmanifest" />
-        <link rel="icon" type="image/png" sizes="64x64" href="/cheongeumrok-favicon-v7.png" />
-        <link rel="shortcut icon" type="image/png" href="/cheongeumrok-favicon-v7.png" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=5" />
+        <link rel="icon" type="image/png" sizes="64x64" href="/cheongeumrok-favicon-v7.png?v=2" />
+        <link rel="shortcut icon" type="image/png" href="/cheongeumrok-favicon-v7.png?v=2" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=6" />
       </head>
       <body>
         <PwaRegister />
