@@ -12,7 +12,7 @@ export default function BeyondYourFencePage() {
   return (
     <main className="beyondPage">
       <AppHeader />
-      <section className="pageHero beyondHero">
+      <section className="beyondHero beyondHeroClean">
         <p className="eyebrow">listening curriculum</p>
         <h1>Beyond<br />Your Fence</h1>
         <p className="lead">
