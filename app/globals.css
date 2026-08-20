@@ -2510,3 +2510,155 @@ blockquote { line-height: 1.7; }
     padding: 50px 18px 24px !important;
   }
 }
+
+/* Admin dashboard */
+.adminDashboard {
+  display: grid;
+  gap: 18px;
+}
+.adminStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.adminStats div,
+.adminPanel,
+.adminRow,
+.adminUserCard {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: 0 18px 48px var(--shadow);
+}
+.adminStats div {
+  border-radius: 22px;
+  padding: 18px;
+  display: grid;
+  gap: 4px;
+}
+.adminStats b {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 38px;
+  line-height: .9;
+}
+.adminStats span,
+.adminMeta,
+.adminRow small,
+.adminUserCard small {
+  color: var(--muted);
+}
+.adminPanel {
+  border-radius: 30px;
+  padding: 18px;
+}
+.compactTitle {
+  margin-bottom: 14px;
+}
+.compactTitle h2 {
+  font-size: clamp(30px, 4vw, 48px);
+}
+.adminList {
+  display: grid;
+  gap: 10px;
+}
+.adminRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  border-radius: 22px;
+  padding: 14px;
+}
+.adminRow b {
+  display: block;
+  margin: 4px 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px;
+}
+.adminRow p:not(.adminMeta) {
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 6px 0;
+}
+.adminMeta {
+  font-size: 12px;
+}
+.adminActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.adminActions a,
+.adminActions button,
+.statusPill {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--muted);
+  padding: 6px 9px;
+  font-size: 12px;
+}
+.adminActions button {
+  cursor: pointer;
+}
+.adminActions button:disabled {
+  opacity: .42;
+  cursor: not-allowed;
+}
+.statusPill {
+  color: var(--accent-2);
+  border-color: rgba(183,102,53,.35);
+}
+.statusPill.resolved { color: var(--accent); border-color: rgba(45,74,62,.38); }
+.statusPill.dismissed { opacity: .68; }
+.dangerButton {
+  color: var(--accent-2) !important;
+  border-color: rgba(183,102,53,.45) !important;
+}
+.adminUserGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.adminUserCard {
+  display: grid;
+  gap: 6px;
+  border-radius: 18px;
+  padding: 14px;
+}
+.adminUserCard b {
+  font-family: 'Space Grotesk', sans-serif;
+}
+.adminUserCard span {
+  width: fit-content;
+  border: 1px solid rgba(183,102,53,.35);
+  border-radius: 999px;
+  color: var(--accent-2);
+  padding: 3px 7px;
+  font-size: 11px;
+}
+:root[data-theme='dark'] .adminStats div,
+:root[data-theme='dark'] .adminPanel,
+:root[data-theme='dark'] .adminRow,
+:root[data-theme='dark'] .adminUserCard {
+  background: var(--surface) !important;
+  border-color: var(--line) !important;
+}
+:root[data-theme='dark'] .adminActions a,
+:root[data-theme='dark'] .adminActions button,
+:root[data-theme='dark'] .statusPill {
+  background: var(--surface-soft) !important;
+  border-color: var(--line) !important;
+}
+
+@media (max-width: 820px) {
+  .adminStats,
+  .adminRow,
+  .adminUserGrid {
+    grid-template-columns: 1fr;
+  }
+  .adminActions {
+    justify-content: flex-start;
+  }
+}
