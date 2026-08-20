@@ -25,6 +25,8 @@ export default function AdminDashboard() {
   const [reviews, setReviews] = useState([]);
   const [albumsById, setAlbumsById] = useState(new Map());
   const [reports, setReports] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [eventsAvailable, setEventsAvailable] = useState(true);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
 
@@ -76,7 +78,7 @@ export default function AdminDashboard() {
   }, []);
 
   async function loadAdminData() {
-    const [profileResult, reviewResult, reportResult] = await Promise.all([
+    const [profileResult, reviewResult, reportResult, eventResult] = await Promise.all([
       supabase
         .from('profiles')
         .select('id, username, display_name, is_admin, created_at')
@@ -92,18 +94,30 @@ export default function AdminDashboard() {
         .select('id, target_type, target_id, reporter_id, reason, status, created_at')
         .order('created_at', { ascending: false })
         .limit(20),
+      supabase
+        .from('visit_events')
+        .select('id, event_type, user_id, anonymous_id, path, referrer, metadata, created_at')
+        .order('created_at', { ascending: false })
+        .limit(30),
     ]);
 
     if (profileResult.error || reviewResult.error || reportResult.error) {
       setMessage(profileResult.error?.message || reviewResult.error?.message || reportResult.error?.message || '관리 데이터를 불러오지 못했습니다.');
     }
+    if (eventResult.error) {
+      setEventsAvailable(false);
+    } else {
+      setEventsAvailable(true);
+    }
 
     const nextProfiles = profileResult.data || [];
     const nextReviews = reviewResult.data || [];
     const nextReports = reportResult.data || [];
+    const nextEvents = eventResult.data || [];
     setProfiles(nextProfiles);
     setReviews(nextReviews);
     setReports(nextReports);
+    setEvents(nextEvents);
 
     const albumIds = Array.from(new Set(nextReviews.map((review) => review.album_id).filter(Boolean)));
     if (albumIds.length) {
@@ -172,6 +186,27 @@ export default function AdminDashboard() {
         <div><b>{reviews.length}</b><span>최근 리뷰</span></div>
         <div><b>{reports.filter((item) => item.status === 'open').length}</b><span>미처리 신고</span></div>
       </div>
+
+      <section className="adminPanel">
+        <div className="sectionTitle compactTitle">
+          <div><p className="eyebrow">events</p><h2>최근 행동 로그</h2></div>
+        </div>
+        <div className="adminList">
+          {!eventsAvailable ? <p className="empty">visit_events SQL을 실행하면 방문/행동 로그가 표시됩니다.</p> : null}
+          {eventsAvailable && events.length ? events.map((event) => {
+            const actor = event.user_id ? profilesById.get(event.user_id) : null;
+            return (
+              <article className="adminRow compactRow" key={event.id}>
+                <div>
+                  <p className="adminMeta">{formatDate(event.created_at)} · {event.event_type}</p>
+                  <b>{event.path || 'unknown path'}</b>
+                  <small>{actor?.display_name || actor?.username || shortId(event.user_id || event.anonymous_id)}{event.referrer ? ` · from ${event.referrer}` : ''}</small>
+                </div>
+              </article>
+            );
+          }) : eventsAvailable ? <p className="empty">아직 이벤트가 없습니다.</p> : null}
+        </div>
+      </section>
 
       <section className="adminPanel">
         <div className="sectionTitle compactTitle">

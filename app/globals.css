@@ -2662,3 +2662,17 @@ blockquote { line-height: 1.7; }
     justify-content: flex-start;
   }
 }
+
+.adminRow.compactRow {
+  grid-template-columns: 1fr;
+}
+.shareInline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.shareInline small {
+  color: var(--muted);
+  font-size: 12px;
+}

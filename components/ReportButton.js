@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { logEvent } from '../lib/events';
 import { supabase } from '../lib/supabase';
 
 export default function ReportButton({ targetType, targetId }) {
@@ -28,7 +29,10 @@ export default function ReportButton({ targetType, targetId }) {
     });
 
     if (error) setMessage(error.message);
-    else setMessage('신고가 접수되었습니다.');
+    else {
+      setMessage('신고가 접수되었습니다.');
+      logEvent('report_created', { targetType, targetId });
+    }
     setStatus('idle');
   }
 

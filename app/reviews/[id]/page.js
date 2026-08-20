@@ -2,6 +2,7 @@ import Link from 'next/link';
 import AppHeader from '../../../components/AppHeader';
 import ReviewCard from '../../../components/ReviewCard';
 import ReportButton from '../../../components/ReportButton';
+import ShareButton from '../../../components/ShareButton';
 import { inferMusicTags, parseOntologyTags } from '../../../lib/taste';
 import { supabase } from '../../../lib/supabase';
 
@@ -147,6 +148,7 @@ export default async function ReviewDetailPage({ params }) {
           <div className="heroActions">
             <Link className="primary" href={`/albums/${review.album.id}`}>앨범 페이지</Link>
             <Link className="secondary" href="/reviews">리뷰 피드</Link>
+            <ShareButton label="공유" text={`${review.album.title} 리뷰`} path={`/reviews/${review.id}`} />
             <ReportButton targetType="review" targetId={review.id} />
           </div>
         </div>

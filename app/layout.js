@@ -1,4 +1,6 @@
+import { Suspense } from 'react';
 import PwaRegister from '../components/PwaRegister';
+import VisitTracker from '../components/VisitTracker';
 import './globals.css';
 
 export const metadata = {
@@ -58,6 +60,7 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <PwaRegister />
+        <Suspense fallback={null}><VisitTracker /></Suspense>
         {children}
       </body>
     </html>

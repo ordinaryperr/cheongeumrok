@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { logEvent } from '../lib/events';
 import { supabase } from '../lib/supabase';
 
 export default function LoginForm() {
@@ -30,7 +31,7 @@ export default function LoginForm() {
       ? supabase.auth.signInWithPassword({ email, password })
       : supabase.auth.signUp({ email, password });
 
-    const { error } = await request;
+    const { data, error } = await request;
 
     if (error) {
       setStatus('error');
@@ -39,6 +40,7 @@ export default function LoginForm() {
     }
 
     setStatus('done');
+    logEvent(mode === 'signin' ? 'login' : 'signup', { userId: data?.user?.id || null });
 
     if (mode === 'signin') {
       router.replace(nextPath);

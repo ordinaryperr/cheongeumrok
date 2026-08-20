@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { musicTagSchema } from '../data/musicOntology';
 import { inferMusicTags, normalizeMusicTagRecord } from '../lib/taste';
+import { logEvent } from '../lib/events';
 import { syncUserTasteSignals } from '../lib/userTasteSignals';
 import { supabase } from '../lib/supabase';
 
@@ -167,7 +168,7 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
         .filter(Boolean)
         .join('\n\n');
 
-      const { error } = await supabase
+      const { data: savedReview, error } = await supabase
         .from('reviews')
         .insert({
           user_id: user.id,
@@ -177,9 +178,12 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
           one_liner: oneLiner,
           body: reviewBody,
           is_public: true,
-        });
+        })
+        .select('id')
+        .single();
 
       if (error) throw error;
+      logEvent('review_created', { reviewId: savedReview?.id, albumId, trackId, rating });
 
       try {
         await upsertMusicTags({ albumId, trackId, tags: ontologyTags });
