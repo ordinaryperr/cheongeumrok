@@ -40,6 +40,7 @@ alter table public.reviews enable row level security;
 drop policy if exists "public reviews are readable" on public.reviews;
 drop policy if exists "users can insert own reviews" on public.reviews;
 drop policy if exists "users can update own reviews" on public.reviews;
+drop policy if exists "admins can moderate reviews" on public.reviews;
 drop policy if exists "users can delete own reviews" on public.reviews;
 
 create policy "public reviews are readable"
@@ -56,6 +57,12 @@ on public.reviews for update
 to authenticated
 using (auth.uid() = user_id)
 with check (auth.uid() = user_id);
+
+create policy "admins can moderate reviews"
+on public.reviews for update
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
 
 create policy "users can delete own reviews"
 on public.reviews for delete

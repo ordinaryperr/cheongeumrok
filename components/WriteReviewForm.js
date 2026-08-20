@@ -10,6 +10,7 @@ import { syncUserTasteSignals } from '../lib/userTasteSignals';
 import { supabase } from '../lib/supabase';
 
 const scores = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
+const DRAFT_KEY_PREFIX = 'cheongeumrok-write-draft:';
 
 export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
   const router = useRouter();
@@ -44,6 +45,40 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
   const queryString = searchParams.toString();
   const nextPath = `${pathname}${queryString ? `?${queryString}` : ''}`;
   const loginHref = `/login?next=${encodeURIComponent(nextPath)}`;
+  const draftKey = `${DRAFT_KEY_PREFIX}${music.id || music.mockId || music.title}`;
+
+  useEffect(() => {
+    try {
+      const rawDraft = window.localStorage.getItem(draftKey);
+      if (!rawDraft) return;
+      const draft = JSON.parse(rawDraft);
+      setRating(draft.rating ?? 4.5);
+      setOneLiner(draft.oneLiner || '');
+      setRecommendedTrack(draft.recommendedTrack || '');
+      setBody(draft.body || '');
+      setExpansionNote(draft.expansionNote || '');
+      if (draft.genreTag) setGenreTag(draft.genreTag);
+      if (draft.moodTag) setMoodTag(draft.moodTag);
+      if (draft.textureTag) setTextureTag(draft.textureTag);
+      if (draft.difficultyTag) setDifficultyTag(draft.difficultyTag);
+    } catch {}
+  }, [draftKey]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(draftKey, JSON.stringify({
+        rating,
+        oneLiner,
+        recommendedTrack,
+        body,
+        expansionNote,
+        genreTag,
+        moodTag,
+        textureTag,
+        difficultyTag,
+      }));
+    } catch {}
+  }, [draftKey, rating, oneLiner, recommendedTrack, body, expansionNote, genreTag, moodTag, textureTag, difficultyTag]);
 
   useEffect(() => {
     let mounted = true;
@@ -218,6 +253,7 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
       setRecommendedTrack('');
       setBody('');
       setExpansionNote('');
+      try { window.localStorage.removeItem(draftKey); } catch {}
       router.replace(`/albums/${albumId}?saved=1`);
       router.refresh();
     } catch (error) {

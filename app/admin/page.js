@@ -1,7 +1,7 @@
 import AppHeader from '../../components/AppHeader';
 import AdminDashboard from '../../components/AdminDashboard';
 
-export const metadata = { title: '관리자 대시보드 | 청음록' };
+export const metadata = { title: '관리자 대시보드 | 청음록', robots: { index: false, follow: false } };
 
 export default function AdminPage() {
   return (

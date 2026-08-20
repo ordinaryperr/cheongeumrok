@@ -48,7 +48,9 @@ export default function LoginForm() {
       return;
     }
 
-    setMessage('회원가입이 완료되었습니다. 이메일 확인이 필요할 수 있습니다. 확인 후 로그인해 주세요.');
+    setMessage('회원가입이 완료되었습니다. 기록 화면으로 이동합니다.');
+    router.replace(nextPath);
+    router.refresh();
   }
 
   return (

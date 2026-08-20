@@ -3,7 +3,7 @@ export default function robots() {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/admin/'],
+      disallow: ['/admin', '/admin/'],
     },
     sitemap: 'https://cheongeumrok.vercel.app/sitemap.xml',
   };

@@ -15,7 +15,14 @@ function formatDate(value) {
 }
 
 function shortId(value = '') {
-  return String(value).slice(0, 8);
+  return String(value || '').slice(0, 8) || 'anonymous';
+}
+
+function targetHref(report) {
+  if (!report) return null;
+  if (report.target_type === 'review') return `/reviews/${report.target_id}`;
+  if (report.target_type === 'profile') return `/users/${report.target_id}`;
+  return null;
 }
 
 export default function AdminDashboard() {
@@ -78,6 +85,7 @@ export default function AdminDashboard() {
   }, []);
 
   async function loadAdminData() {
+    setMessage('');
     const [profileResult, reviewResult, reportResult, eventResult] = await Promise.all([
       supabase
         .from('profiles')
@@ -141,6 +149,16 @@ export default function AdminDashboard() {
     setReports((items) => items.map((item) => (item.id === reportId ? { ...item, status } : item)));
   }
 
+  async function setReviewVisibility(reviewId, isPublic) {
+    setMessage('');
+    const { error } = await supabase.from('reviews').update({ is_public: isPublic }).eq('id', reviewId);
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+    setReviews((items) => items.map((item) => (item.id === reviewId ? { ...item, is_public: isPublic } : item)));
+  }
+
   async function deleteReview(reviewId) {
     const ok = window.confirm('이 리뷰를 삭제할까요? 되돌릴 수 없습니다.');
     if (!ok) return;
@@ -152,6 +170,20 @@ export default function AdminDashboard() {
     }
     setReviews((items) => items.filter((item) => item.id !== reviewId));
   }
+
+  const todayEvents = events.filter((event) => Date.now() - new Date(event.created_at).getTime() < 24 * 60 * 60 * 1000).length;
+  const signupEvents = events.filter((event) => event.event_type === 'signup').length;
+  const reviewEvents = events.filter((event) => event.event_type === 'review_created').length;
+  const topPaths = Array.from(events.reduce((map, event) => {
+    if (!event.path) return map;
+    map.set(event.path, (map.get(event.path) || 0) + 1);
+    return map;
+  }, new Map()).entries()).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const topReferrers = Array.from(events.reduce((map, event) => {
+    const referrer = event.referrer || 'direct';
+    map.set(referrer, (map.get(referrer) || 0) + 1);
+    return map;
+  }, new Map()).entries()).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
   if (loading) {
     return <p className="empty">관리자 권한을 확인하는 중입니다.</p>;
@@ -186,6 +218,10 @@ export default function AdminDashboard() {
         <div><b>{reviews.length}</b><span>최근 리뷰</span></div>
         <div><b>{reports.filter((item) => item.status === 'open').length}</b><span>미처리 신고</span></div>
       </div>
+      <div className="adminActions adminTopActions">
+        <button type="button" onClick={loadAdminData}>새로고침</button>
+        <Link href="/admin/news">뉴스 관리</Link>
+      </div>
 
       <section className="adminPanel">
         <div className="sectionTitle compactTitle">
@@ -193,6 +229,19 @@ export default function AdminDashboard() {
         </div>
         <div className="adminList">
           {!eventsAvailable ? <p className="empty">visit_events SQL을 실행하면 방문/행동 로그가 표시됩니다.</p> : null}
+          {eventsAvailable ? (
+            <div className="adminInsightGrid">
+              <div><b>{todayEvents}</b><span>최근 24시간 이벤트</span></div>
+              <div><b>{signupEvents}</b><span>최근 가입 이벤트</span></div>
+              <div><b>{reviewEvents}</b><span>최근 리뷰 작성 이벤트</span></div>
+            </div>
+          ) : null}
+          {eventsAvailable && topPaths.length ? (
+            <div className="adminMiniList"><b>인기 경로</b>{topPaths.map(([path, count]) => <span key={path}>{path} · {count}</span>)}</div>
+          ) : null}
+          {eventsAvailable && topReferrers.length ? (
+            <div className="adminMiniList"><b>유입 경로</b>{topReferrers.map(([referrer, count]) => <span key={referrer}>{referrer} · {count}</span>)}</div>
+          ) : null}
           {eventsAvailable && events.length ? events.map((event) => {
             const actor = event.user_id ? profilesById.get(event.user_id) : null;
             return (
@@ -215,12 +264,14 @@ export default function AdminDashboard() {
         <div className="adminList">
           {reports.length ? reports.map((report) => {
             const reporter = profilesById.get(report.reporter_id);
+            const href = targetHref(report);
             return (
               <article className="adminRow" key={report.id}>
                 <div>
                   <p className="adminMeta">{formatDate(report.created_at)} · {report.target_type} · {shortId(report.target_id)}</p>
                   <b>{report.reason}</b>
                   <small>신고자: {reporter?.display_name || reporter?.username || shortId(report.reporter_id)}</small>
+                  {href ? <p><Link href={href}>신고 대상 열기 →</Link></p> : null}
                 </div>
                 <div className="adminActions">
                   <span className={`statusPill ${report.status}`}>{report.status}</span>
@@ -252,6 +303,7 @@ export default function AdminDashboard() {
                 </div>
                 <div className="adminActions">
                   <Link href={`/reviews/${review.id}`}>열기</Link>
+                  {review.is_public ? <button type="button" onClick={() => setReviewVisibility(review.id, false)}>숨김</button> : <button type="button" onClick={() => setReviewVisibility(review.id, true)}>복구</button>}
                   <button type="button" className="dangerButton" onClick={() => deleteReview(review.id)}>삭제</button>
                 </div>
               </article>

@@ -2676,3 +2676,57 @@ blockquote { line-height: 1.7; }
   color: var(--muted);
   font-size: 12px;
 }
+
+.adminTopActions {
+  justify-content: flex-start;
+  margin-top: -6px;
+}
+.adminInsightGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.adminInsightGrid div,
+.adminMiniList {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface-soft);
+  padding: 12px;
+}
+.adminInsightGrid b {
+  display: block;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 26px;
+}
+.adminInsightGrid span,
+.adminMiniList span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.adminMiniList {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.adminMiniList b {
+  margin-right: 4px;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.adminMiniList span {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 7px;
+}
+.inlineComment .reportInline {
+  margin-left: 6px;
+}
+.inlineComment .reportInline button {
+  padding: 3px 7px;
+  font-size: 11px;
+}
+@media (max-width: 820px) {
+  .adminInsightGrid {
+    grid-template-columns: 1fr;
+  }
+}

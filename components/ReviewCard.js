@@ -3,7 +3,9 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import ReportButton from './ReportButton';
+import ShareButton from './ShareButton';
 import { parseOntologyTags } from '../lib/taste';
+import { logEvent } from '../lib/events';
 import { supabase } from '../lib/supabase';
 
 function isUuid(value) {
@@ -102,6 +104,7 @@ export default function ReviewCard({ review }) {
       if (!error) {
         setLiked(false);
         setLikeCount((count) => Math.max(0, count - 1));
+        logEvent('review_unliked', { reviewId: review.id });
       } else {
         setMessage(error.message);
       }
@@ -113,6 +116,7 @@ export default function ReviewCard({ review }) {
       if (!error) {
         setLiked(true);
         setLikeCount((count) => count + 1);
+        logEvent('review_liked', { reviewId: review.id });
       } else {
         setMessage(error.message);
       }
@@ -160,6 +164,7 @@ export default function ReviewCard({ review }) {
       setComments((items) => [...items, { ...data, user: currentUser.email?.split('@')[0] || 'me' }]);
       setCommentBody('');
       setCommentOpen(true);
+      logEvent('comment_created', { reviewId: review.id, commentId: data.id });
     }
 
     setStatus('idle');
@@ -196,6 +201,7 @@ export default function ReviewCard({ review }) {
           <button type="button" onClick={() => setCommentOpen((open) => !open)} disabled={!canInteract}>댓글 {comments.length || review.commentCount || 0}</button>
           {canInteract ? <Link href={`/reviews/${review.id}`}>리뷰 보기</Link> : null}
           <Link href={`/albums/${review.album.id}`}>앨범 보기</Link>
+          {canInteract ? <ShareButton label="공유" text={`${review.album.title} 리뷰`} path={`/reviews/${review.id}`} /> : null}
           {canInteract ? <ReportButton targetType="review" targetId={review.id} /> : null}
         </div>
         {!canInteract ? <p className="socialMessage">샘플 리뷰는 좋아요/댓글을 사용할 수 없습니다.</p> : null}
@@ -204,10 +210,11 @@ export default function ReviewCard({ review }) {
           <div className="commentThread">
             {comments.length ? comments.map((comment) => (
               <div className="inlineComment" key={comment.id}>
-                <b>{comment.user || (comment.user_id === user?.id ? 'me' : 'listener')}</b>
+                {comment.user_id ? <Link href={`/users/${comment.user_id}`}><b>{comment.user || (comment.user_id === user?.id ? 'me' : 'listener')}</b></Link> : <b>{comment.user || 'listener'}</b>}
                 <span>{formatCommentTime(comment.created_at)}</span>
                 <p>{comment.body}</p>
                 {comment.user_id === user?.id ? <button type="button" onClick={() => handleDeleteComment(comment.id)} disabled={status === 'saving'}>삭제</button> : null}
+                {comment.id ? <ReportButton targetType="review_comment" targetId={comment.id} /> : null}
               </div>
             )) : <p className="socialMessage">아직 댓글이 없습니다. 첫 의견을 남겨보세요.</p>}
             <form className="inlineCommentForm" onSubmit={handleCommentSubmit}>
