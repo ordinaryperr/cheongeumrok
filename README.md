@@ -49,16 +49,20 @@ http://localhost:3000
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
 SPOTIFY_CLIENT_ID=
 SPOTIFY_CLIENT_SECRET=
 ```
 
+`SUPABASE_SERVICE_ROLE_KEY`는 서버의 카탈로그 검증 API에서만 사용합니다.
+`NEXT_PUBLIC_` 접두사를 붙이거나 클라이언트 코드에 전달하지 마세요.
+
 ## Supabase 설정
 
-Supabase SQL Editor에서 아래 순서로 실행합니다.
+새 Supabase 프로젝트는 SQL Editor에서 아래 순서로 실행합니다.
 
 1. `supabase/schema.sql`
-2. `supabase/ontology-schema.sql`
+2. `supabase/migrations/202608230001_security_ownership_and_privacy.sql`
 
 `schema.sql`은 기본 MVP 테이블을 생성합니다.
 
@@ -72,7 +76,8 @@ Supabase SQL Editor에서 아래 순서로 실행합니다.
 - `follows`
 - `news_posts`
 
-`ontology-schema.sql`은 취향 분석/태그 기능용 테이블을 생성합니다.
+보안 migration은 취향 분석/태그·신고·방문 이벤트 테이블과 RLS 정책을
+원자적으로 적용합니다. 기존 프로젝트에는 migration만 적용합니다.
 
 - `music_tags`
 - `user_taste_signals`

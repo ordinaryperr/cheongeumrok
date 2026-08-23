@@ -37,15 +37,19 @@ Vercel Project Settings > Environment Variables에 아래 값을 등록합니다
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
 SPOTIFY_CLIENT_ID=
 SPOTIFY_CLIENT_SECRET=
 ```
 
 값은 로컬 `.env.local`에 있는 값을 그대로 옮기면 됩니다.
+`SUPABASE_SERVICE_ROLE_KEY`는 서버 전용 비밀값입니다. 브라우저에 노출되는
+`NEXT_PUBLIC_` 변수로 등록하지 마세요.
 
 ## Supabase 확인
 
-Supabase SQL Editor에서 `supabase/schema.sql`이 적용되어 있어야 합니다.
+새 프로젝트에는 `supabase/schema.sql`을 먼저 적용하고, 모든 환경에는
+`supabase/migrations/202608230001_security_ownership_and_privacy.sql`을 적용해야 합니다.
 
 필수 테이블:
 

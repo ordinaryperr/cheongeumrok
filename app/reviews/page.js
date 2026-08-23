@@ -97,12 +97,12 @@ export default async function ReviewsPage({ searchParams }) {
   const reviewIds = (data || []).map((review) => review.id);
   const engagementCounts = await getEngagementCounts(reviewIds);
   const { data: tagData } = supabase
-    ? await supabase.from('music_tags').select('target_type, target_id, genre, mood, texture, difficulty')
+    ? await supabase.from('music_tags').select('user_id, target_type, target_id, genre, mood, texture, difficulty')
     : { data: [] };
-  const tagMap = new Map((tagData || []).map((tag) => [`${tag.target_type}:${tag.target_id}`, tag]));
+  const tagMap = new Map((tagData || []).map((tag) => [`${tag.user_id}:${tag.target_type}:${tag.target_id}`, tag]));
   const enrichedData = (data || []).map((review) => ({
     ...review,
-    musicTag: tagMap.get(`${review.track_id ? 'track' : 'album'}:${review.track_id || review.album_id}`) || null,
+    musicTag: tagMap.get(`${review.user_id}:${review.track_id ? 'track' : 'album'}:${review.track_id || review.album_id}`) || null,
   }));
   const mappedReviews = enrichedData.map((review) => mapSupabaseReview(review, engagementCounts.get(review.id)));
   const tagOptions = ['All', 'Jazz', 'Ambient', 'Post-Punk', 'R&B', 'Hip-Hop', 'Electronic', 'Freshman', 'Sophomore', 'Junior', 'Senior'];

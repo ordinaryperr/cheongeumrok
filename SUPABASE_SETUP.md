@@ -20,7 +20,11 @@ cp .env.example .env.local
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
+
+`SUPABASE_SERVICE_ROLE_KEY`는 Spotify 카탈로그를 검증해 저장하는 서버
+라우트에서만 사용합니다. 절대로 `NEXT_PUBLIC_` 접두사를 붙이지 마세요.
 
 ## 3. DB 스키마 실행
 
@@ -42,9 +46,11 @@ Supabase 대시보드에서:
 - `follows`
 - `news_posts`
 
-## 4. 취향 온톨로지 스키마 실행
+## 4. 보안 migration 실행
 
-취향 태그/추천 신호 기능을 사용하려면 Supabase SQL Editor에서 `supabase/ontology-schema.sql`도 실행합니다.
+`supabase/migrations/202608230001_security_ownership_and_privacy.sql`을 실행합니다.
+이 migration은 취향 태그/추천 신호, 신고, 방문 이벤트 테이블과 보안 정책을
+한 트랜잭션에서 적용합니다.
 
 생성되는 테이블:
 
