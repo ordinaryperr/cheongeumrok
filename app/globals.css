@@ -167,6 +167,8 @@ h1 {
   line-height: 1.8;
 }
 .heroActions { display: flex; gap: 10px; margin-top: 30px; flex-wrap: wrap; }
+.mainHeroActions .primary { min-width: 220px; font-weight: 700; }
+.mainHeroActions .secondary { min-width: 180px; }
 .startGuide {
   display: inline-grid;
   gap: 4px;
@@ -950,6 +952,8 @@ blockquote { line-height: 1.7; }
     grid-template-columns: 1fr;
     width: 100%;
   }
+  .mainHeroActions .primary,
+  .mainHeroActions .secondary { width: 100%; min-width: 0; }
   .heroFlow,
   .homePage .albumGrid,
   .homePage .feedList,
