@@ -459,7 +459,30 @@ blockquote { line-height: 1.7; }
 .pageHero.small h1 { font-size: clamp(46px, 7vw, 92px); line-height: .9; letter-spacing: -.08em; }
 .topTight { padding-top: 24px; }
 .narrow { max-width: 860px; }
-.searchBox { display: flex; gap: 8px; margin-top: 26px; max-width: 620px; }
+.searchGuide {
+  display: grid;
+  gap: 4px;
+  max-width: 680px;
+  margin-top: 26px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface);
+  padding: 16px;
+  box-shadow: 0 18px 42px var(--shadow);
+}
+.searchGuide b { font-size: 17px; }
+.searchGuide span { color: var(--muted); line-height: 1.55; }
+.searchBox { display: flex; gap: 8px; margin-top: 12px; max-width: 680px; }
+.quickSearches { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; max-width: 680px; margin-top: 12px; }
+.quickSearches span { color: var(--accent-2); font-family: 'Space Grotesk'; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; }
+.quickSearches button {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--muted);
+  padding: 7px 10px;
+}
+.quickSearches button:hover { transform: translateY(-2px); border-color: var(--accent-2); color: var(--accent-2); }
 .searchBox input, .writeForm input, .writeForm textarea, .writeForm select { width: 100%; border: 1px solid var(--line); border-radius: 16px; background: rgba(255,250,241,.72); padding: 14px; color: var(--ink); font: inherit; font-size: 16px; }
 .searchBox button { min-height: 52px; border: 1px solid var(--ink); border-radius: 16px; background: var(--ink); color: var(--paper); padding: 0 18px; }
 .searchBox button:disabled { opacity: .45; cursor: not-allowed; }
@@ -486,6 +509,7 @@ blockquote { line-height: 1.7; }
 }
 .spotifyResultCard h3 { font-size: 24px; line-height: 1; letter-spacing: -.05em; }
 .spotifyResultCard .reviewActions a { border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; color: var(--muted); font-size: 13px; }
+.spotifyResultCard .reviewActions .recordAction { border-color: var(--ink); background: var(--ink); color: var(--paper); }
 .writeForm { display: grid; gap: 14px; border: 1px solid var(--line); border-radius: 28px; background: rgba(255,250,241,.62); padding: 18px; }
 .selectedMusicCard {
   display: grid;
@@ -503,12 +527,74 @@ blockquote { line-height: 1.7; }
 .bigCover { width: 132px; }
 .writeForm label { display: grid; gap: 8px; color: var(--muted); }
 .writeForm textarea { min-height: 180px; resize: vertical; }
+.writeStepNotice {
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface-soft);
+  padding: 16px;
+}
+.writeStepNotice span { color: var(--accent-2); font-family: 'Space Grotesk'; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; }
+.writeStepNotice b { display: block; margin-top: 6px; font-size: 20px; }
+.writeStepNotice p { margin-top: 6px; color: var(--muted); line-height: 1.55; }
+.optionalReviewFields {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface-soft);
+  padding: 14px;
+}
+.optionalReviewFields summary {
+  cursor: pointer;
+  color: var(--accent-2);
+  font-family: 'Space Grotesk';
+  font-size: 13px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.optionalReviewFields[open] { display: grid; gap: 14px; }
+.optionalReviewFields[open] summary { margin-bottom: 4px; }
 .full { width: 100%; }
 .profileHero { max-width: 1000px; margin: 0 auto; padding: 76px 24px 34px; display: grid; grid-template-columns: 120px 1fr; gap: 24px; align-items: center; }
 .avatar { width: 120px; height: 120px; border-radius: 34px; display: grid; place-items: center; background: var(--ink); color: var(--paper); font-family: 'Space Grotesk'; font-size: 44px; font-weight: 700; }
 .profileHero h1 { font-size: clamp(48px, 8vw, 92px); }
 .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
 .stats div { border: 1px solid var(--line); border-radius: 20px; padding: 16px; background: rgba(255,250,241,.62); display: grid; gap: 4px; }
+.profileArchiveOverview {
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: var(--surface);
+  padding: 18px;
+  margin-bottom: 18px;
+  box-shadow: 0 18px 42px var(--shadow);
+}
+.profileArchiveHeader { display: flex; justify-content: space-between; gap: 16px; align-items: end; margin-bottom: 14px; }
+.profileArchiveHeader h2 { font-size: clamp(30px, 4vw, 46px); }
+.profileAlbumShelf { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.profileAlbumShelf a {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface-soft);
+  padding: 10px;
+}
+.profileAlbumShelf a:hover { transform: translateY(-3px); border-color: var(--accent-2); }
+.profileAlbumShelf span {
+  aspect-ratio: 1;
+  border-radius: 15px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, rgba(45,74,62,.9), rgba(183,102,53,.78));
+  color: var(--paper);
+  font-family: 'Space Grotesk';
+  font-size: 28px;
+  font-weight: 700;
+  background-size: cover;
+  background-position: center;
+}
+.profileAlbumShelf b { font-family: 'Space Grotesk'; line-height: 1.05; }
+.profileAlbumShelf small { color: var(--muted); }
+.profileOneLiners { display: grid; gap: 8px; margin-top: 14px; }
+.profileOneLiners blockquote { border-left: 2px solid var(--accent-2); padding-left: 10px; color: var(--muted); }
 .stats b { font-family: 'Space Grotesk'; font-size: 30px; }
 .stats span { color: var(--muted); }
 .albumDetail { max-width: 1080px; margin: 0 auto; padding: 76px 24px 34px; display: grid; grid-template-columns: minmax(260px, 380px) 1fr; gap: 34px; align-items: center; }
@@ -725,6 +811,17 @@ blockquote { line-height: 1.7; }
   gap: 8px;
   margin-top: 30px;
 }
+.beyondRecordGate {
+  max-width: 720px;
+  margin-top: 24px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--surface);
+  padding: 18px;
+  box-shadow: 0 18px 42px var(--shadow);
+}
+.beyondRecordGate b { font-size: 20px; }
+.beyondRecordGate p { margin-top: 8px; color: var(--muted); line-height: 1.65; }
 .beyondManifesto span {
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -935,6 +1032,11 @@ blockquote { line-height: 1.7; }
   }
   .mainHeroActions .primary,
   .mainHeroActions .secondary { width: 100%; min-width: 0; }
+  .quickSearches { align-items: stretch; }
+  .quickSearches button { flex: 1 1 auto; }
+  .profileArchiveHeader { display: grid; }
+  .profileAlbumShelf { grid-template-columns: repeat(2, 1fr); }
+  .beyondRecordGate .heroActions { width: 100%; }
   .heroFlow,
   .homePage .albumGrid,
   .homePage .feedList,

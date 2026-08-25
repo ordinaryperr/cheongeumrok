@@ -24,6 +24,14 @@ export default function BeyondYourFencePage() {
           <span>Do not skip the semester.</span>
           <span>A record is your attendance.</span>
         </div>
+        <div className="beyondRecordGate">
+          <b>Beyond는 기록이 쌓일수록 더 정확해집니다.</b>
+          <p>아직 기록이 적다면 먼저 음악을 검색해 별점과 한줄평을 남겨보세요. 그 기록이 커리큘럼 진도와 취향 신호로 연결됩니다.</p>
+          <div className="heroActions">
+            <a className="primary" href="/search">음악 검색하고 기록하기</a>
+            <a className="secondary" href="/profile">내 취향 신호 보기</a>
+          </div>
+        </div>
       </section>
 
       <section className="section topTight beyondOverview">

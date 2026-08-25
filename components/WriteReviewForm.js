@@ -281,7 +281,12 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
   }
 
   return (
-    <form className="writeForm" onSubmit={handleSubmit}>
+    <form className="writeForm simplifiedWriteForm" onSubmit={handleSubmit}>
+      <div className="writeStepNotice">
+        <span>필수는 두 가지</span>
+        <b>별점과 한줄평만 남겨도 기록이 저장됩니다.</b>
+        <p>긴 감상, 추천 트랙, 취향 신호는 아래 선택 입력에서 천천히 더할 수 있어요.</p>
+      </div>
       <label>선택한 음악
         <input value={`${music.title} - ${music.artist}`} readOnly />
       </label>
@@ -304,33 +309,39 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
           ))}
         </div>
       </label>
-      <div className="tagSelectGrid">
-        <label>Genre Signal
-          <select value={genreTag} onChange={(event) => setGenreTag(event.target.value)}>
-            {musicTagSchema.genre.map((item) => <option key={item} value={item}>{item}</option>)}
-          </select>
-        </label>
-        <label>Mood Signal
-          <select value={moodTag} onChange={(event) => setMoodTag(event.target.value)}>
-            {musicTagSchema.mood.map((item) => <option key={item} value={item}>{item}</option>)}
-          </select>
-        </label>
-        <label>Texture Signal
-          <select value={textureTag} onChange={(event) => setTextureTag(event.target.value)}>
-            {musicTagSchema.texture.map((item) => <option key={item} value={item}>{item}</option>)}
-          </select>
-        </label>
-        <label>Difficulty
-          <select value={difficultyTag} onChange={(event) => setDifficultyTag(event.target.value)}>
-            {musicTagSchema.difficulty.map((item) => <option key={item} value={item}>{item}</option>)}
-          </select>
-        </label>
-      </div>
-      <label>한줄평<input value={oneLiner} onChange={(event) => setOneLiner(event.target.value)} placeholder="이 음악을 한 문장으로 남긴다면" /></label>
-      <label>추천 트랙<input value={recommendedTrack} onChange={(event) => setRecommendedTrack(event.target.value)} placeholder="처음 듣는 사람에게 먼저 들려주고 싶은 곡" /></label>
-      <label>감상문<textarea value={body} onChange={(event) => setBody(event.target.value)} placeholder="들으면서 떠오른 장면, 감정, 문장, 다른 장르로 이어지는 생각을 적어보세요." /></label>
-      <label>취향 확장 메모<input value={expansionNote} onChange={(event) => setExpansionNote(event.target.value)} placeholder="이 앨범이 내 울타리를 어떻게 넓혔나요?" /></label>
-      <button type="submit" className="primary full" disabled={status === 'saving'}>{status === 'saving' ? '저장 중...' : '기록 저장하기'}</button>
+      <label>한줄평<input value={oneLiner} onChange={(event) => setOneLiner(event.target.value)} placeholder="이 음악을 한 문장으로 남긴다면" required /></label>
+      <button type="submit" className="primary full" disabled={status === 'saving' || !oneLiner.trim()}>{status === 'saving' ? '저장 중...' : '별점과 한줄평 저장하기'}</button>
+      <details className="optionalReviewFields">
+        <summary>선택 입력 더 쓰기</summary>
+        <label>추천 트랙<input value={recommendedTrack} onChange={(event) => setRecommendedTrack(event.target.value)} placeholder="처음 듣는 사람에게 먼저 들려주고 싶은 곡" /></label>
+        <label>감상문<textarea value={body} onChange={(event) => setBody(event.target.value)} placeholder="들으면서 떠오른 장면, 감정, 문장, 다른 장르로 이어지는 생각을 적어보세요." /></label>
+        <label>취향 확장 메모<input value={expansionNote} onChange={(event) => setExpansionNote(event.target.value)} placeholder="이 앨범이 내 울타리를 어떻게 넓혔나요?" /></label>
+      </details>
+      <details className="optionalReviewFields">
+        <summary>고급 취향 신호 조정</summary>
+        <div className="tagSelectGrid">
+          <label>Genre Signal
+            <select value={genreTag} onChange={(event) => setGenreTag(event.target.value)}>
+              {musicTagSchema.genre.map((item) => <option key={item} value={item}>{item}</option>)}
+            </select>
+          </label>
+          <label>Mood Signal
+            <select value={moodTag} onChange={(event) => setMoodTag(event.target.value)}>
+              {musicTagSchema.mood.map((item) => <option key={item} value={item}>{item}</option>)}
+            </select>
+          </label>
+          <label>Texture Signal
+            <select value={textureTag} onChange={(event) => setTextureTag(event.target.value)}>
+              {musicTagSchema.texture.map((item) => <option key={item} value={item}>{item}</option>)}
+            </select>
+          </label>
+          <label>Difficulty
+            <select value={difficultyTag} onChange={(event) => setDifficultyTag(event.target.value)}>
+              {musicTagSchema.difficulty.map((item) => <option key={item} value={item}>{item}</option>)}
+            </select>
+          </label>
+        </div>
+      </details>
       {message ? <p className={`formMessage ${status}`}>{message} {status === 'error' && message.includes('로그인') ? <Link href={loginHref}>로그인하러 가기</Link> : null}</p> : null}
     </form>
   );

@@ -132,6 +132,18 @@ export default function ProfileClient() {
   }, [reviews]);
 
   const tasteSignals = useMemo(() => extractTasteSignals(reviews), [reviews]);
+  const archiveAlbums = useMemo(() => {
+    const seen = new Set();
+    return reviews
+      .map((review) => review.album)
+      .filter((album) => {
+        if (!album?.id || seen.has(album.id)) return false;
+        seen.add(album.id);
+        return true;
+      })
+      .slice(0, 8);
+  }, [reviews]);
+  const recentOneLiners = useMemo(() => reviews.filter((review) => review.oneLiner).slice(0, 3), [reviews]);
   const beyondSummary = useMemo(() => {
     if (!reviews.length) return [];
     return curriculumTracks.map((track) => {
@@ -203,6 +215,31 @@ export default function ProfileClient() {
           <div><b>{followCounts.followers}</b><span>팔로워</span></div>
           <div><b>{followCounts.following}</b><span>팔로잉</span></div>
         </div>
+        {reviews.length ? (
+          <div className="profileArchiveOverview">
+            <div className="profileArchiveHeader">
+              <div>
+                <p className="eyebrow">taste archive</p>
+                <h2>내가 쌓은 음악의 표면</h2>
+              </div>
+              <Link className="textLink" href="/search">새 기록 추가 →</Link>
+            </div>
+            <div className="profileAlbumShelf">
+              {archiveAlbums.map((album) => (
+                <Link href={`/albums/${album.id}`} key={album.id}>
+                  <span className={album.coverUrl ? 'imageCover' : ''} style={album.coverUrl ? { backgroundImage: `url(${album.coverUrl})` } : undefined}>{album.coverUrl ? '' : album.title.slice(0, 1)}</span>
+                  <b>{album.title}</b>
+                  <small>{album.artist}</small>
+                </Link>
+              ))}
+            </div>
+            {recentOneLiners.length ? (
+              <div className="profileOneLiners">
+                {recentOneLiners.map((review) => <blockquote key={review.id}>“{review.oneLiner}”</blockquote>)}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
         {reviews.length ? (
           <div className="profileTastePanel">
             <div>

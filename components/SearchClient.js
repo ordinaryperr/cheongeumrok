@@ -89,13 +89,15 @@ function ResultCard({ item, context }) {
         <div className="reviewActions">
           <a href={item.externalUrl || '#'} target="_blank" rel="noreferrer">Spotify</a>
           {browseHref ? <Link href={browseHref}>앨범 둘러보기</Link> : null}
-          <Link href={writeHref}>기록하기</Link>
+          <Link className="recordAction" href={writeHref}>기록하기</Link>
           {context ? <Link href={context.beyondHref}>Beyond Route</Link> : null}
         </div>
       </div>
     </article>
   );
 }
+
+const exampleQueries = ['Radiohead', '백예린', 'Kendrick Lamar', 'NewJeans', 'Miles Davis'];
 
 export default function SearchClient({ initialQuery = '' }) {
   const resultsRef = useRef(null);
@@ -156,11 +158,20 @@ export default function SearchClient({ initialQuery = '' }) {
     await runSearch();
   }
 
+  async function handleExampleSearch(keyword) {
+    setQuery(keyword);
+    await runSearch(keyword);
+  }
+
   const hasResults = results.albums.length > 0 || results.tracks.length > 0;
   const searchContext = useMemo(() => findSearchContext(query), [query]);
 
   return (
     <>
+      <div className="searchGuide">
+        <b>좋아하는 앨범, 지금 들은 곡, 아티스트 이름으로 시작하세요.</b>
+        <span>검색은 로그인 없이 가능하고, 기록 저장 단계에서만 로그인이 필요합니다.</span>
+      </div>
       <form className="searchBox" onSubmit={handleSubmit} role="search">
         <input
           type="search"
@@ -174,6 +185,12 @@ export default function SearchClient({ initialQuery = '' }) {
         />
         <button type="submit" disabled={status === 'loading' || !query.trim()}>{status === 'loading' ? '검색중' : '검색'}</button>
       </form>
+      <div className="quickSearches" aria-label="예시 검색어">
+        <span>예시</span>
+        {exampleQueries.map((keyword) => (
+          <button type="button" key={keyword} onClick={() => handleExampleSearch(keyword)} disabled={status === 'loading'}>{keyword}</button>
+        ))}
+      </div>
       {searchContext ? (
         <div className="searchContextBox">
           <span>Archive / Beyond Context</span>
@@ -186,7 +203,7 @@ export default function SearchClient({ initialQuery = '' }) {
         </div>
       ) : null}
       {message ? <p className="searchMessage">{message}</p> : null}
-      {status === 'done' && !hasResults ? <p className="searchMessage">검색 결과가 없습니다.</p> : null}
+      {status === 'done' && !hasResults ? <p className="searchMessage">검색 결과가 없습니다. 곡 제목보다 아티스트명이나 앨범명으로 다시 검색해보세요.</p> : null}
       {hasResults ? (
         <section className="spotifyResults" ref={resultsRef}>
           {results.albums.length ? (
