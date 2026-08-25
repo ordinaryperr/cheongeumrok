@@ -82,15 +82,19 @@ export default async function Home() {
         <p className="lead">
           청음록은 음악을 검색해 감상을 남기고, 기록된 취향 신호를 바탕으로 Beyond 커리큘럼까지 이어지는 음악 기록 서비스입니다.
         </p>
+        <div className="startGuide">
+          <span>처음 왔다면</span>
+          <b>음악 검색 → 별점과 감상 기록 → 내 취향 확장</b>
+        </div>
         <div className="heroActions">
-          <Link href="/search" className="primary">첫 음악 기록하기</Link>
-          <Link href="/archive" className="secondary">좋은 음악 아카이브</Link>
-          <Link href="/beyond-your-fence" className="secondary">Beyond 시작하기</Link>
+          <Link href="/search" className="primary">지금 들은 음악 검색하기</Link>
+          <Link href="/archive" className="secondary">추천 앨범 먼저 보기</Link>
+          <Link href="/beyond-your-fence" className="secondary">취향 확장 루트 보기</Link>
         </div>
         <div className="homeFocusGrid" aria-label="청음록 핵심 흐름">
-          <Link href="/search"><span>01</span><b>Search & Write</b><small>Spotify에서 찾고 바로 기록합니다.</small></Link>
-          <Link href="/archive"><span>02</span><b>Archive</b><small>장르별 실제 앨범으로 취향을 넓힙니다.</small></Link>
-          <Link href="/beyond-your-fence"><span>03</span><b>Beyond</b><small>기록을 커리큘럼 진도로 바꿉니다.</small></Link>
+          <Link href="/search"><span>STEP 01</span><b>음악 찾기</b><small>앨범·곡·아티스트를 검색합니다.</small><em>가장 먼저 할 일</em></Link>
+          <Link href="/write"><span>STEP 02</span><b>감상 남기기</b><small>별점, 한줄평, 긴 감상을 저장합니다.</small><em>내 기록 쌓기</em></Link>
+          <Link href="/profile"><span>STEP 03</span><b>내 취향 보기</b><small>기록이 모이면 Beyond로 이어집니다.</small><em>다음 음악 발견</em></Link>
         </div>
       </section>
 
