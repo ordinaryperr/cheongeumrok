@@ -35,9 +35,6 @@ html {
   scroll-behavior: smooth;
   scroll-padding-top: 74px;
 }
-html:has(.beyondPage) {
-  scroll-snap-type: y mandatory;
-}
 body {
   min-height: 100vh;
   color: var(--ink);
@@ -135,8 +132,6 @@ nav button, .loginLink {
 }
 
 .hero {
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
   min-height: calc(100vh - 74px);
   display: grid;
   align-content: center;
@@ -229,8 +224,6 @@ h1 {
 .spotifyButton { border-color: #1db954; color: #1b7f3a; }
 
 .section {
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
   min-height: calc(100vh - 74px);
   max-width: 1180px;
   margin: 0 auto;
@@ -248,8 +241,6 @@ h1 {
   overflow: visible;
 }
 .introLanding {
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
   position: relative;
   display: grid;
   place-items: center;
@@ -719,12 +710,6 @@ blockquote { line-height: 1.7; }
   .commentComposer { grid-template-columns: 1fr; }
 }
 
-.beyondPage > .pageHero,
-.beyondPage > .section,
-.beyondPage .curriculumTrack {
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-}
 .beyondHero {
   min-height: calc(100vh - 74px);
   display: grid;
@@ -875,10 +860,6 @@ blockquote { line-height: 1.7; }
 
 /* Mobile polish */
 @media (max-width: 820px) {
-  html:has(.homePage),
-  html:has(.beyondPage) {
-    scroll-snap-type: none;
-  }
   .siteHeader {
     position: sticky;
     grid-template-columns: 1fr;
@@ -1661,14 +1642,12 @@ blockquote { line-height: 1.7; }
   gap: 16px;
   overflow-x: auto;
   overflow-y: hidden;
-  scroll-snap-type: x mandatory;
   padding: 4px 4px 18px;
   margin-inline: -4px;
   scrollbar-width: thin;
 }
 .homePage .archiveGrid .archiveCard {
   flex: 0 0 min(430px, 86vw);
-  scroll-snap-align: start;
 }
 .homePage .archiveGrid::-webkit-scrollbar {
   height: 10px;
