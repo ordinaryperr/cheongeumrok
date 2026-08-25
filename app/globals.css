@@ -35,7 +35,6 @@ html {
   scroll-behavior: smooth;
   scroll-padding-top: 74px;
 }
-html:has(.homePage),
 html:has(.beyondPage) {
   scroll-snap-type: y mandatory;
 }
@@ -235,15 +234,18 @@ h1 {
   margin: 0 auto;
   padding: 76px 24px;
 }
-.introLanding,
-.homePage > .hero,
-.homePage > .section {
-  height: calc(100svh - 74px);
-  min-height: auto;
-  overflow: hidden;
-}
 .introLanding {
   height: 100svh;
+  min-height: 100svh;
+  overflow: hidden;
+}
+.homePage > .hero,
+.homePage > .section {
+  height: auto;
+  min-height: auto;
+  overflow: visible;
+}
+.introLanding {
   scroll-snap-align: start;
   scroll-snap-stop: always;
   position: relative;
@@ -322,9 +324,9 @@ h1 {
 .homePage > .section {
   width: min(1180px, 100%);
   display: grid;
-  align-content: center;
-  padding-top: clamp(28px, 4vh, 52px);
-  padding-bottom: clamp(28px, 4vh, 52px);
+  align-content: start;
+  padding-top: clamp(48px, 7vw, 86px);
+  padding-bottom: clamp(56px, 8vw, 96px);
 }
 @keyframes waveDraw { from { stroke-dashoffset: 1800; opacity: 0; } to { stroke-dashoffset: 0; opacity: 1; } }
 @keyframes waveSlide { to { transform: translateX(-50%); } }
