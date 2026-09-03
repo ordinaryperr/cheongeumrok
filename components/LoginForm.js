@@ -5,11 +5,24 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { logEvent } from '../lib/events';
 import { supabase } from '../lib/supabase';
 
+function getSafeInternalPath(value) {
+  if (typeof value !== 'string' || !value.startsWith('/')) return null;
+
+  try {
+    const baseUrl = 'https://cheongeumrok.internal';
+    const url = new URL(value, baseUrl);
+    if (url.origin !== baseUrl) return null;
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return null;
+  }
+}
+
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get('next');
-  const nextPath = next?.startsWith('/') && !next.startsWith('//') ? next : '/write';
+  const nextPath = getSafeInternalPath(next) || '/write';
   const [mode, setMode] = useState('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -45,6 +58,11 @@ export default function LoginForm() {
     if (mode === 'signin') {
       router.replace(nextPath);
       router.refresh();
+      return;
+    }
+
+    if (!data?.session) {
+      setMessage('회원가입이 완료되었습니다. 이메일 인증 후 로그인해 주세요.');
       return;
     }
 

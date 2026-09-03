@@ -30,8 +30,11 @@
 
 ## 시작하기
 
+Node.js 22.13 이상(22.x) 또는 24.x를 사용합니다. Node.js 21과 23은
+일부 개발 의존성이 지원하지 않으므로 사용하지 않습니다.
+
 ```bash
-npm install
+npm ci
 cp .env.example .env.local
 npm run dev
 ```
@@ -56,6 +59,8 @@ SPOTIFY_CLIENT_SECRET=
 
 `SUPABASE_SERVICE_ROLE_KEY`는 서버의 카탈로그 검증 API에서만 사용합니다.
 `NEXT_PUBLIC_` 접두사를 붙이거나 클라이언트 코드에 전달하지 마세요.
+Supabase의 새 `sb_secret_...` 형식 키를 사용할 수 있으며, 운영 프로젝트와
+Vercel 프로젝트의 값이 같은 Supabase 프로젝트를 가리켜야 합니다.
 
 ## Supabase 설정
 
@@ -95,15 +100,21 @@ where id = 'USER_ID';
 ```bash
 npm run dev      # 개발 서버
 npm run lint     # ESLint 검사
+npm test         # 보안/배포 준비 회귀 테스트
 npm run build    # 프로덕션 빌드 확인
+npm run check    # test → lint → build 전체 게이트
+npm run audit:prod # 운영 의존성 high 이상 취약점 확인
 npm run start    # 빌드 결과 실행
 ```
 
-배포 전 자동 확인/커밋/푸시:
+`npm run deploy`는 현재 브랜치의 모든 변경을 커밋하고 원격으로 push합니다.
+반드시 변경 파일과 브랜치를 검토한 뒤 명시적으로 실행하세요.
 
 ```bash
 npm run deploy -- "Commit message"
 ```
+
+이 명령은 실행 전에 `check`와 운영 의존성 감사를 통과해야 합니다.
 
 ## 배포 전 테스트 플로우
 

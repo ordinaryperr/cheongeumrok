@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { musicTagSchema } from '../data/musicOntology';
@@ -25,6 +25,7 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
   const [status, setStatus] = useState('idle');
   const [message, setMessage] = useState('');
   const [authStatus, setAuthStatus] = useState('checking');
+  const restoredDraftKeyRef = useRef(null);
 
   const currentMock = fallbackAlbums.find((album) => album.id === selectedMockId) || fallbackAlbums[0];
   const music = selectedMusic || {
@@ -48,23 +49,36 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
   const draftKey = `${DRAFT_KEY_PREFIX}${music.id || music.mockId || music.title}`;
 
   useEffect(() => {
-    try {
-      const rawDraft = window.localStorage.getItem(draftKey);
-      if (!rawDraft) return;
-      const draft = JSON.parse(rawDraft);
-      setRating(draft.rating ?? 4.5);
-      setOneLiner(draft.oneLiner || '');
-      setRecommendedTrack(draft.recommendedTrack || '');
-      setBody(draft.body || '');
-      setExpansionNote(draft.expansionNote || '');
-      if (draft.genreTag) setGenreTag(draft.genreTag);
-      if (draft.moodTag) setMoodTag(draft.moodTag);
-      if (draft.textureTag) setTextureTag(draft.textureTag);
-      if (draft.difficultyTag) setDifficultyTag(draft.difficultyTag);
-    } catch {}
+    let cancelled = false;
+    restoredDraftKeyRef.current = null;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      try {
+        const rawDraft = window.localStorage.getItem(draftKey);
+        if (rawDraft) {
+          const draft = JSON.parse(rawDraft);
+          setRating(draft.rating ?? 4.5);
+          setOneLiner(draft.oneLiner || '');
+          setRecommendedTrack(draft.recommendedTrack || '');
+          setBody(draft.body || '');
+          setExpansionNote(draft.expansionNote || '');
+          if (draft.genreTag) setGenreTag(draft.genreTag);
+          if (draft.moodTag) setMoodTag(draft.moodTag);
+          if (draft.textureTag) setTextureTag(draft.textureTag);
+          if (draft.difficultyTag) setDifficultyTag(draft.difficultyTag);
+        }
+      } catch {
+        try { window.localStorage.removeItem(draftKey); } catch {}
+      }
+      restoredDraftKeyRef.current = draftKey;
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [draftKey]);
 
   useEffect(() => {
+    if (restoredDraftKeyRef.current !== draftKey) return;
     try {
       window.localStorage.setItem(draftKey, JSON.stringify({
         rating,

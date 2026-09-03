@@ -34,14 +34,13 @@ export default function AdminDashboard() {
   const [reports, setReports] = useState([]);
   const [events, setEvents] = useState([]);
   const [eventsAvailable, setEventsAvailable] = useState(true);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Boolean(supabase));
   const [message, setMessage] = useState('');
 
   const isAdmin = Boolean(profile?.is_admin);
 
   useEffect(() => {
     if (!supabase) {
-      setLoading(false);
       return;
     }
 

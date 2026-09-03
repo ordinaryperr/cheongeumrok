@@ -1,6 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { getSpotifyItem, hasSpotifyCredentials, isValidSpotifyId } from '../../../../lib/spotify';
 
+const MAX_AUTHORIZATION_LENGTH = 8192;
+
 function createServerClients() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -54,6 +56,9 @@ async function ensureTrack(admin, track, albumId) {
 
 export async function POST(request) {
   const authorization = request.headers.get('authorization') || '';
+  if (authorization.length > MAX_AUTHORIZATION_LENGTH) {
+    return Response.json({ error: 'Invalid authorization header' }, { status: 400 });
+  }
   const accessToken = authorization.match(/^Bearer\s+(.+)$/i)?.[1];
   if (!accessToken) {
     return Response.json({ error: 'Authentication required' }, { status: 401 });

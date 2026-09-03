@@ -94,7 +94,7 @@ export default function NewsAdminForm() {
       <label>요약<textarea value={summary} onChange={(event) => setSummary(event.target.value)} required placeholder="뉴스 카드에 표시될 짧은 설명" /></label>
       <label>카테고리<input value={category} onChange={(event) => setCategory(event.target.value)} placeholder="New Release, Scene, Essay..." /></label>
       <label>출처<input value={source} onChange={(event) => setSource(event.target.value)} /></label>
-      <label>출처 URL<input value={sourceUrl} onChange={(event) => setSourceUrl(event.target.value)} placeholder="https://..." /></label>
+      <label>출처 URL<input type="url" value={sourceUrl} onChange={(event) => setSourceUrl(event.target.value)} placeholder="https://..." pattern="https?://.*" /></label>
       <button className="primary full" disabled={status === 'saving' || !user || !isAdmin}>{status === 'saving' ? '등록 중...' : '뉴스 등록하기'}</button>
       {message ? <p className={`formMessage ${status}`}>{message}</p> : null}
     </form>
