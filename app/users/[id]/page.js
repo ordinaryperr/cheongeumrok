@@ -98,11 +98,12 @@ async function getUserPageData(id) {
 
   const { data: tagData } = await supabase
     .from('music_tags')
-    .select('target_type, target_id, genre, mood, texture, era, difficulty, adjacent_genres');
-  const tagMap = new Map((tagData || []).map((tag) => [`${tag.target_type}:${tag.target_id}`, normalizeMusicTagRecord(tag)]));
+    .select('user_id, target_type, target_id, genre, mood, texture, era, difficulty, adjacent_genres')
+    .eq('user_id', id);
+  const tagMap = new Map((tagData || []).map((tag) => [`${tag.user_id}:${tag.target_type}:${tag.target_id}`, normalizeMusicTagRecord(tag)]));
   const enrichedReviews = (reviews || []).map((review) => ({
     ...review,
-    musicTag: tagMap.get(`${review.track_id ? 'track' : 'album'}:${review.track_id || review.album_id}`) || null,
+    musicTag: tagMap.get(`${id}:${review.track_id ? 'track' : 'album'}:${review.track_id || review.album_id}`) || null,
   }));
 
   return { profile, reviews: enrichedReviews, followerCount: followerCount || 0, followingCount: followingCount || 0 };

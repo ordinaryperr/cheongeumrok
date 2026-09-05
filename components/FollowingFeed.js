@@ -124,11 +124,12 @@ export default function FollowingFeed({ selectedTag = 'All' }) {
 
       const { data: tagData } = await supabase
         .from('music_tags')
-        .select('target_type, target_id, genre, mood, texture, difficulty');
-      const tagMap = new Map((tagData || []).map((tag) => [`${tag.target_type}:${tag.target_id}`, tag]));
+        .select('user_id, target_type, target_id, genre, mood, texture, difficulty')
+        .in('user_id', followingIds);
+      const tagMap = new Map((tagData || []).map((tag) => [`${tag.user_id}:${tag.target_type}:${tag.target_id}`, tag]));
       const enrichedData = (data || []).map((review) => ({
         ...review,
-        musicTag: tagMap.get(`${review.track_id ? 'track' : 'album'}:${review.track_id || review.album_id}`) || null,
+        musicTag: tagMap.get(`${review.user_id}:${review.track_id ? 'track' : 'album'}:${review.track_id || review.album_id}`) || null,
       }));
 
       setReviews(enrichedData.map(mapReview));

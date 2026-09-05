@@ -8,20 +8,9 @@ export default async function WritePage({ searchParams }) {
   const params = await searchParams;
   let spotifyItem = null;
 
-  if (params?.spotify && params?.type && params?.title && params?.artist) {
-    spotifyItem = {
-      id: params.spotify,
-      type: params.type,
-      title: params.title,
-      artist: params.artist,
-      album: params.album || '',
-      year: params.year || '',
-      releaseDate: params.releaseDate || params.year || '',
-      durationMs: params.durationMs ? Number(params.durationMs) : null,
-      coverUrl: params.coverUrl || null,
-      externalUrl: params.externalUrl || null,
-    };
-  } else if (params?.spotify && params?.type && hasSpotifyCredentials()) {
+  // URL metadata is untrusted. Resolve the canonical Spotify resource before
+  // rendering artwork or carrying values into the review flow.
+  if (params?.spotify && params?.type && hasSpotifyCredentials()) {
     try {
       spotifyItem = await getSpotifyItem({ id: params.spotify, type: params.type });
     } catch {

@@ -13,10 +13,17 @@ export default function ThemeToggle() {
   const [theme, setTheme] = useState('light');
 
   useEffect(() => {
-    const nextTheme = getInitialTheme();
-    setTheme(nextTheme);
-    document.documentElement.dataset.theme = nextTheme;
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', nextTheme === 'dark' ? '#0f0d0b' : '#f5f0e8');
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      const nextTheme = getInitialTheme();
+      setTheme(nextTheme);
+      document.documentElement.dataset.theme = nextTheme;
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', nextTheme === 'dark' ? '#0f0d0b' : '#f5f0e8');
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   function toggleTheme() {

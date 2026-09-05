@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { musicTagSchema } from '../data/musicOntology';
@@ -25,6 +25,7 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
   const [status, setStatus] = useState('idle');
   const [message, setMessage] = useState('');
   const [authStatus, setAuthStatus] = useState('checking');
+  const restoredDraftKeyRef = useRef(null);
 
   const currentMock = fallbackAlbums.find((album) => album.id === selectedMockId) || fallbackAlbums[0];
   const music = selectedMusic || {
@@ -48,23 +49,36 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
   const draftKey = `${DRAFT_KEY_PREFIX}${music.id || music.mockId || music.title}`;
 
   useEffect(() => {
-    try {
-      const rawDraft = window.localStorage.getItem(draftKey);
-      if (!rawDraft) return;
-      const draft = JSON.parse(rawDraft);
-      setRating(draft.rating ?? 4.5);
-      setOneLiner(draft.oneLiner || '');
-      setRecommendedTrack(draft.recommendedTrack || '');
-      setBody(draft.body || '');
-      setExpansionNote(draft.expansionNote || '');
-      if (draft.genreTag) setGenreTag(draft.genreTag);
-      if (draft.moodTag) setMoodTag(draft.moodTag);
-      if (draft.textureTag) setTextureTag(draft.textureTag);
-      if (draft.difficultyTag) setDifficultyTag(draft.difficultyTag);
-    } catch {}
+    let cancelled = false;
+    restoredDraftKeyRef.current = null;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      try {
+        const rawDraft = window.localStorage.getItem(draftKey);
+        if (rawDraft) {
+          const draft = JSON.parse(rawDraft);
+          setRating(draft.rating ?? 4.5);
+          setOneLiner(draft.oneLiner || '');
+          setRecommendedTrack(draft.recommendedTrack || '');
+          setBody(draft.body || '');
+          setExpansionNote(draft.expansionNote || '');
+          if (draft.genreTag) setGenreTag(draft.genreTag);
+          if (draft.moodTag) setMoodTag(draft.moodTag);
+          if (draft.textureTag) setTextureTag(draft.textureTag);
+          if (draft.difficultyTag) setDifficultyTag(draft.difficultyTag);
+        }
+      } catch {
+        try { window.localStorage.removeItem(draftKey); } catch {}
+      }
+      restoredDraftKeyRef.current = draftKey;
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [draftKey]);
 
   useEffect(() => {
+    if (restoredDraftKeyRef.current !== draftKey) return;
     try {
       window.localStorage.setItem(draftKey, JSON.stringify({
         rating,
@@ -106,50 +120,29 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
     };
   }, []);
 
-  async function upsertAlbum(item) {
-    const { data, error } = await supabase
-      .from('albums')
-      .upsert({
-        spotify_id: item.id || `mock:${item.mockId}`,
-        title: item.type === 'track' ? item.album || item.title : item.title,
-        artist: item.artist,
-        cover_url: item.coverUrl,
-        release_date: item.releaseDate || item.year || null,
-        album_type: item.type === 'track' ? 'track-source' : 'album',
-        external_url: item.externalUrl,
-      }, { onConflict: 'spotify_id' })
-      .select('id')
-      .single();
+  async function ensureCatalogItem(item, accessToken) {
+    const response = await fetch('/api/catalog/ensure', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ spotifyId: item.id, type: item.type }),
+    });
+    const result = await response.json();
 
-    if (error) throw error;
-    return data.id;
+    if (!response.ok) throw new Error(result.error || '음악 정보를 확인하지 못했습니다.');
+    return result;
   }
 
-  async function upsertTrack(item, albumId) {
-    const { data, error } = await supabase
-      .from('tracks')
-      .upsert({
-        spotify_id: item.id,
-        album_id: albumId,
-        title: item.title,
-        artist: item.artist,
-        duration_ms: item.durationMs,
-        external_url: item.externalUrl,
-      }, { onConflict: 'spotify_id' })
-      .select('id')
-      .single();
-
-    if (error) throw error;
-    return data.id;
-  }
-
-  async function upsertMusicTags({ albumId, trackId, tags }) {
+  async function upsertMusicTags({ albumId, trackId, userId, tags }) {
     const targetType = trackId ? 'track' : 'album';
     const targetId = trackId || albumId;
 
     const { error } = await supabase
       .from('music_tags')
       .upsert({
+        user_id: userId,
         target_type: targetType,
         target_id: targetId,
         genre: tags.genre || null,
@@ -158,7 +151,7 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
         era: tags.era || null,
         difficulty: tags.difficulty || null,
         adjacent_genres: tags.adjacentGenres || [],
-      }, { onConflict: 'target_type,target_id' });
+      }, { onConflict: 'target_type,target_id,user_id' });
 
     if (error) throw error;
   }
@@ -184,8 +177,11 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
     }
 
     try {
-      const albumId = await upsertAlbum(music);
-      const trackId = music.type === 'track' ? await upsertTrack(music, albumId) : null;
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+      if (!accessToken) throw new Error('로그인 세션을 확인하지 못했습니다. 다시 로그인해주세요.');
+
+      const { albumId, trackId } = await ensureCatalogItem(music, accessToken);
       const ontologyTags = {
         genre: genreTag,
         mood: moodTag,
@@ -221,7 +217,7 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
       logEvent('review_created', { reviewId: savedReview?.id, albumId, trackId, rating });
 
       try {
-        await upsertMusicTags({ albumId, trackId, tags: ontologyTags });
+        await upsertMusicTags({ albumId, trackId, userId: user.id, tags: ontologyTags });
       } catch (tagError) {
         console.warn('music_tags 저장을 건너뜁니다:', tagError.message);
       }
@@ -235,11 +231,12 @@ export default function WriteReviewForm({ selectedMusic, fallbackAlbums }) {
           .limit(150);
         const { data: tagData } = await supabase
           .from('music_tags')
-          .select('target_type, target_id, genre, mood, texture, era, difficulty, adjacent_genres');
-        const tagMap = new Map((tagData || []).map((tag) => [`${tag.target_type}:${tag.target_id}`, normalizeMusicTagRecord(tag)]));
+          .select('user_id, target_type, target_id, genre, mood, texture, era, difficulty, adjacent_genres')
+          .eq('user_id', user.id);
+        const tagMap = new Map((tagData || []).map((tag) => [`${tag.user_id}:${tag.target_type}:${tag.target_id}`, normalizeMusicTagRecord(tag)]));
         const enrichedReviews = (userReviews || []).map((review) => ({
           ...review,
-          musicTag: tagMap.get(`${review.track_id ? 'track' : 'album'}:${review.track_id || review.album_id}`) || null,
+          musicTag: tagMap.get(`${user.id}:${review.track_id ? 'track' : 'album'}:${review.track_id || review.album_id}`) || null,
         }));
         const { error: tasteError } = await syncUserTasteSignals(user.id, enrichedReviews);
         if (tasteError) console.warn('user_taste_signals 저장을 건너뜁니다:', tasteError.message);

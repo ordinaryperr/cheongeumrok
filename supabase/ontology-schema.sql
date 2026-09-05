@@ -4,6 +4,7 @@
 
 create table if not exists public.music_tags (
   id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade,
   target_type text not null check (target_type in ('album', 'track')),
   target_id uuid not null,
   genre text,
@@ -12,9 +13,18 @@ create table if not exists public.music_tags (
   era text,
   difficulty text check (difficulty in ('Freshman', 'Sophomore', 'Junior', 'Senior')),
   adjacent_genres text[] default '{}',
-  created_at timestamptz default now(),
-  unique (target_type, target_id)
+  created_at timestamptz default now()
 );
+
+alter table public.music_tags add column if not exists user_id uuid references auth.users(id) on delete cascade;
+alter table public.music_tags drop constraint if exists music_tags_target_type_target_id_key;
+create unique index if not exists music_tags_target_owner_uidx
+  on public.music_tags (target_type, target_id, user_id) nulls not distinct;
+create index if not exists reviews_public_album_tag_owner_idx
+  on public.reviews (user_id, album_id) where is_public and album_id is not null;
+create index if not exists reviews_public_track_tag_owner_idx
+  on public.reviews (user_id, track_id) where is_public and track_id is not null;
+create index if not exists music_tags_user_id_idx on public.music_tags (user_id);
 
 create table if not exists public.user_taste_signals (
   id uuid primary key default gen_random_uuid(),
@@ -33,7 +43,7 @@ create or replace function public.is_admin()
 returns boolean
 language sql
 security definer
-set search_path = public
+set search_path = pg_catalog, public
 stable
 as $$
   select coalesce((select profiles.is_admin from public.profiles where profiles.id = auth.uid()), false);
@@ -43,7 +53,7 @@ create or replace function public.user_has_review_for_music_tag(target_type text
 returns boolean
 language sql
 security definer
-set search_path = public
+set search_path = pg_catalog, public
 stable
 as $$
   select exists (
@@ -64,6 +74,7 @@ drop policy if exists "Authenticated users can update music tags" on public.musi
 drop policy if exists "Authenticated users can write music tags for reviewed targets" on public.music_tags;
 drop policy if exists "Authenticated users can update music tags for reviewed targets" on public.music_tags;
 drop policy if exists "Admins can delete music tags" on public.music_tags;
+drop policy if exists "Users can delete own music tags" on public.music_tags;
 drop policy if exists "Users can read own taste signals" on public.user_taste_signals;
 drop policy if exists "Users can write own taste signals" on public.user_taste_signals;
 drop policy if exists "Users can update own taste signals" on public.user_taste_signals;
@@ -71,23 +82,42 @@ drop policy if exists "Users can delete own taste signals" on public.user_taste_
 
 create policy "Public music tags are readable"
   on public.music_tags for select
-  using (true);
+  using (
+    user_id is null
+    or user_id = auth.uid()
+    or public.is_admin()
+    or exists (
+      select 1 from public.reviews
+      where reviews.user_id = music_tags.user_id
+        and reviews.is_public
+        and (
+          (music_tags.target_type = 'album' and reviews.album_id = music_tags.target_id)
+          or (music_tags.target_type = 'track' and reviews.track_id = music_tags.target_id)
+        )
+    )
+  );
 
 create policy "Authenticated users can write music tags for reviewed targets"
   on public.music_tags for insert
   to authenticated
-  with check (public.user_has_review_for_music_tag(target_type, target_id) or public.is_admin());
+  with check (
+    (user_id = auth.uid() and public.user_has_review_for_music_tag(target_type, target_id))
+    or (public.is_admin() and user_id is null)
+  );
 
 create policy "Authenticated users can update music tags for reviewed targets"
   on public.music_tags for update
   to authenticated
-  using (public.user_has_review_for_music_tag(target_type, target_id) or public.is_admin())
-  with check (public.user_has_review_for_music_tag(target_type, target_id) or public.is_admin());
+  using (user_id = auth.uid() or public.is_admin())
+  with check (
+    (user_id = auth.uid() and public.user_has_review_for_music_tag(target_type, target_id))
+    or public.is_admin()
+  );
 
-create policy "Admins can delete music tags"
+create policy "Users can delete own music tags"
   on public.music_tags for delete
   to authenticated
-  using (public.is_admin());
+  using (user_id = auth.uid() or public.is_admin());
 
 create policy "Users can read own taste signals"
   on public.user_taste_signals for select

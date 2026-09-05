@@ -7,11 +7,19 @@ export default function PwaRegister() {
     if (!('serviceWorker' in navigator)) return;
     if (process.env.NODE_ENV !== 'production') return;
 
-    window.addEventListener('load', () => {
+    const register = () => {
       navigator.serviceWorker.register('/sw.js').catch(() => {
         // PWA registration is optional. The app still works as a normal website.
       });
-    });
+    };
+
+    if (document.readyState === 'complete') {
+      register();
+      return;
+    }
+
+    window.addEventListener('load', register, { once: true });
+    return () => window.removeEventListener('load', register);
   }, []);
 
   return null;

@@ -5,8 +5,13 @@ import Link from 'next/link';
 import { curriculumTracks } from '../data/beyondYourFence';
 import { archiveCollections } from '../lib/spotifyArchive';
 
-async function fetchSearchResults(keyword) {
-  const response = await fetch(`/api/spotify/search?q=${encodeURIComponent(keyword)}`, { cache: 'no-store' });
+const MAX_QUERY_LENGTH = 100;
+
+async function fetchSearchResults(keyword, signal) {
+  const response = await fetch(`/api/spotify/search?q=${encodeURIComponent(keyword)}`, {
+    cache: 'no-store',
+    signal,
+  });
   const data = await response.json();
 
   if (!response.ok) {
@@ -79,7 +84,7 @@ function ResultCard({ item, context }) {
 
   return (
     <article className="spotifyResultCard">
-      {item.coverUrl ? <div className="spotifyCover" style={{ backgroundImage: `url(${item.coverUrl})` }} aria-label={`${item.title} cover`} /> : <div className="miniCover"><span>{item.title.slice(0, 1)}</span></div>}
+      {item.coverUrl ? <div className="spotifyCover" style={{ backgroundImage: `url(${item.coverUrl})` }} role="img" aria-label={`${item.title} cover`} /> : <div className="miniCover"><span>{item.title.slice(0, 1)}</span></div>}
       <div>
         <p className="mood">{item.type === 'album' ? 'Album' : 'Track'} · {item.year}</p>
         <h3>{item.title}</h3>
@@ -100,26 +105,27 @@ function ResultCard({ item, context }) {
 const exampleQueries = ['Radiohead', '백예린', 'Kendrick Lamar', 'NewJeans', 'Miles Davis'];
 
 export default function SearchClient({ initialQuery = '' }) {
+  const safeInitialQuery = initialQuery.slice(0, MAX_QUERY_LENGTH);
   const resultsRef = useRef(null);
-  const [query, setQuery] = useState(initialQuery);
+  const [query, setQuery] = useState(safeInitialQuery);
+  const [submittedQuery, setSubmittedQuery] = useState(safeInitialQuery);
   const [results, setResults] = useState({ albums: [], tracks: [] });
-  const [status, setStatus] = useState(initialQuery ? 'loading' : 'idle');
-  const [message, setMessage] = useState(initialQuery ? '검색 중입니다. 잠시만 기다려 주세요.' : '');
+  const [status, setStatus] = useState(safeInitialQuery ? 'loading' : 'idle');
+  const [message, setMessage] = useState(safeInitialQuery ? '검색 중입니다. 잠시만 기다려 주세요.' : '');
 
   useEffect(() => {
-    if (!initialQuery) return;
+    if (!safeInitialQuery) return;
 
-    let cancelled = false;
+    const controller = new AbortController();
 
     async function loadInitialResults() {
       try {
-        const nextResults = await fetchSearchResults(initialQuery);
-        if (cancelled) return;
+        const nextResults = await fetchSearchResults(safeInitialQuery, controller.signal);
         setResults(nextResults);
         setStatus('done');
         setMessage('');
       } catch (error) {
-        if (cancelled) return;
+        if (error.name === 'AbortError') return;
         setResults({ albums: [], tracks: [] });
         setStatus('error');
         setMessage(error.message || '검색 요청 중 문제가 생겼습니다.');
@@ -128,9 +134,9 @@ export default function SearchClient({ initialQuery = '' }) {
 
     loadInitialResults();
     return () => {
-      cancelled = true;
+      controller.abort();
     };
-  }, [initialQuery]);
+  }, [safeInitialQuery]);
 
   async function runSearch(nextQuery = query) {
     const keyword = nextQuery.trim();
@@ -139,6 +145,7 @@ export default function SearchClient({ initialQuery = '' }) {
     setStatus('loading');
     setMessage('검색 중입니다. 잠시만 기다려 주세요.');
     setResults({ albums: [], tracks: [] });
+    setSubmittedQuery(keyword);
 
     try {
       const nextResults = await fetchSearchResults(keyword);
@@ -164,7 +171,7 @@ export default function SearchClient({ initialQuery = '' }) {
   }
 
   const hasResults = results.albums.length > 0 || results.tracks.length > 0;
-  const searchContext = useMemo(() => findSearchContext(query), [query]);
+  const searchContext = useMemo(() => findSearchContext(submittedQuery), [submittedQuery]);
 
   return (
     <>
@@ -182,6 +189,8 @@ export default function SearchClient({ initialQuery = '' }) {
           autoCapitalize="none"
           autoCorrect="off"
           inputMode="search"
+          maxLength={MAX_QUERY_LENGTH}
+          aria-label="Spotify에서 앨범, 곡 또는 아티스트 검색"
         />
         <button type="submit" disabled={status === 'loading' || !query.trim()}>{status === 'loading' ? '검색중' : '검색'}</button>
       </form>

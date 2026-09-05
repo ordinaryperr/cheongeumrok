@@ -95,12 +95,13 @@ export default function ProfileClient() {
 
       const { data: tagData } = await supabase
         .from('music_tags')
-        .select('target_type, target_id, genre, mood, texture, era, difficulty, adjacent_genres');
+        .select('user_id, target_type, target_id, genre, mood, texture, era, difficulty, adjacent_genres')
+        .eq('user_id', currentUser.id);
 
-      const tagMap = new Map((tagData || []).map((tag) => [`${tag.target_type}:${tag.target_id}`, normalizeMusicTagRecord(tag)]));
+      const tagMap = new Map((tagData || []).map((tag) => [`${tag.user_id}:${tag.target_type}:${tag.target_id}`, normalizeMusicTagRecord(tag)]));
       const enrichedReviews = (data || []).map((review) => ({
         ...review,
-        musicTag: tagMap.get(`${review.track_id ? 'track' : 'album'}:${review.track_id || review.album_id}`) || null,
+        musicTag: tagMap.get(`${currentUser.id}:${review.track_id ? 'track' : 'album'}:${review.track_id || review.album_id}`) || null,
       }));
 
       const [{ count: followers }, { count: following }] = await Promise.all([

@@ -30,8 +30,11 @@
 
 ## 시작하기
 
+Node.js 22.13 이상(22.x) 또는 24.x를 사용합니다. Node.js 21과 23은
+일부 개발 의존성이 지원하지 않으므로 사용하지 않습니다.
+
 ```bash
-npm install
+npm ci
 cp .env.example .env.local
 npm run dev
 ```
@@ -49,16 +52,22 @@ http://localhost:3000
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
 SPOTIFY_CLIENT_ID=
 SPOTIFY_CLIENT_SECRET=
 ```
 
+`SUPABASE_SERVICE_ROLE_KEY`는 서버의 카탈로그 검증 API에서만 사용합니다.
+`NEXT_PUBLIC_` 접두사를 붙이거나 클라이언트 코드에 전달하지 마세요.
+Supabase의 새 `sb_secret_...` 형식 키를 사용할 수 있으며, 운영 프로젝트와
+Vercel 프로젝트의 값이 같은 Supabase 프로젝트를 가리켜야 합니다.
+
 ## Supabase 설정
 
-Supabase SQL Editor에서 아래 순서로 실행합니다.
+새 Supabase 프로젝트는 SQL Editor에서 아래 순서로 실행합니다.
 
 1. `supabase/schema.sql`
-2. `supabase/ontology-schema.sql`
+2. `supabase/migrations/202608230001_security_ownership_and_privacy.sql`
 
 `schema.sql`은 기본 MVP 테이블을 생성합니다.
 
@@ -72,7 +81,8 @@ Supabase SQL Editor에서 아래 순서로 실행합니다.
 - `follows`
 - `news_posts`
 
-`ontology-schema.sql`은 취향 분석/태그 기능용 테이블을 생성합니다.
+보안 migration은 취향 분석/태그·신고·방문 이벤트 테이블과 RLS 정책을
+원자적으로 적용합니다. 기존 프로젝트에는 migration만 적용합니다.
 
 - `music_tags`
 - `user_taste_signals`
@@ -90,15 +100,21 @@ where id = 'USER_ID';
 ```bash
 npm run dev      # 개발 서버
 npm run lint     # ESLint 검사
+npm test         # 보안/배포 준비 회귀 테스트
 npm run build    # 프로덕션 빌드 확인
+npm run check    # test → lint → build 전체 게이트
+npm run audit:prod # 운영 의존성 high 이상 취약점 확인
 npm run start    # 빌드 결과 실행
 ```
 
-배포 전 자동 확인/커밋/푸시:
+`npm run deploy`는 현재 브랜치의 모든 변경을 커밋하고 원격으로 push합니다.
+반드시 변경 파일과 브랜치를 검토한 뒤 명시적으로 실행하세요.
 
 ```bash
 npm run deploy -- "Commit message"
 ```
+
+이 명령은 실행 전에 `check`와 운영 의존성 감사를 통과해야 합니다.
 
 ## 배포 전 테스트 플로우
 

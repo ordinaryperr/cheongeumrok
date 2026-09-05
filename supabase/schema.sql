@@ -44,6 +44,14 @@ create table if not exists public.tracks (
   created_at timestamptz not null default now()
 );
 
+-- Trusted catalog API write quota. Browser roles cannot access this table.
+create table if not exists public.catalog_save_usage (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  window_started_at timestamptz not null default now(),
+  request_count integer not null default 0 check (request_count >= 0),
+  updated_at timestamptz not null default now()
+);
+
 -- 4. 리뷰: 앨범 또는 트랙 중 하나에 연결
 create table if not exists public.reviews (
   id uuid primary key default gen_random_uuid(),
@@ -118,7 +126,8 @@ begin
   new.updated_at = now();
   return new;
 end;
-$$ language plpgsql;
+$$ language plpgsql
+set search_path = pg_catalog, public;
 
 drop trigger if exists profiles_set_updated_at on public.profiles;
 create trigger profiles_set_updated_at
@@ -148,7 +157,11 @@ begin
   on conflict (id) do nothing;
   return new;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql
+security definer
+set search_path = pg_catalog, public;
+
+revoke execute on function public.handle_new_user() from public, anon, authenticated;
 
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
@@ -159,6 +172,7 @@ create trigger on_auth_user_created
 alter table public.profiles enable row level security;
 alter table public.albums enable row level security;
 alter table public.tracks enable row level security;
+alter table public.catalog_save_usage enable row level security;
 alter table public.reviews enable row level security;
 alter table public.review_likes enable row level security;
 alter table public.review_comments enable row level security;
@@ -202,11 +216,70 @@ create or replace function public.is_admin()
 returns boolean
 language sql
 security definer
-set search_path = public
+set search_path = pg_catalog, public
 stable
 as $$
   select coalesce((select profiles.is_admin from public.profiles where profiles.id = auth.uid()), false);
 $$;
+
+create or replace function public.can_view_review(p_review_id uuid)
+returns boolean
+language sql
+security definer
+set search_path = pg_catalog, public
+stable
+as $$
+  select exists (
+    select 1
+    from public.reviews
+    where reviews.id = p_review_id
+      and (reviews.is_public or reviews.user_id = auth.uid() or public.is_admin())
+  );
+$$;
+
+create or replace function public.consume_catalog_save_quota(
+  p_user_id uuid,
+  p_limit integer,
+  p_window interval
+)
+returns boolean
+language plpgsql
+security definer
+set search_path = pg_catalog, public
+as $$
+declare
+  v_now timestamptz := clock_timestamp();
+  v_allowed boolean := false;
+begin
+  if p_user_id is null or p_limit is null or p_limit < 1 or p_limit > 1000
+     or p_window is null or p_window <= interval '0 seconds' or p_window > interval '1 day' then
+    return false;
+  end if;
+
+  insert into public.catalog_save_usage (user_id, window_started_at, request_count, updated_at)
+  values (p_user_id, v_now, 1, v_now)
+  on conflict (user_id) do update
+  set window_started_at = case
+        when public.catalog_save_usage.window_started_at + p_window <= v_now then v_now
+        else public.catalog_save_usage.window_started_at
+      end,
+      request_count = case
+        when public.catalog_save_usage.window_started_at + p_window <= v_now then 1
+        else public.catalog_save_usage.request_count + 1
+      end,
+      updated_at = v_now
+  where public.catalog_save_usage.window_started_at + p_window <= v_now
+     or public.catalog_save_usage.request_count < p_limit
+  returning true into v_allowed;
+
+  return coalesce(v_allowed, false);
+end;
+$$;
+
+revoke all on table public.catalog_save_usage from public, anon, authenticated;
+grant select, insert, update, delete on table public.catalog_save_usage to service_role;
+revoke execute on function public.consume_catalog_save_quota(uuid, integer, interval) from public, anon, authenticated;
+grant execute on function public.consume_catalog_save_quota(uuid, integer, interval) to service_role;
 
 -- profiles policies
 create policy "profiles are readable by everyone"
@@ -218,24 +291,21 @@ to authenticated
 using (auth.uid() = id)
 with check (auth.uid() = id);
 
--- albums/tracks: 모두 읽기 가능, 로그인 유저가 캐시 생성 가능
+-- RLS controls rows, not columns. Remove table-wide UPDATE so users cannot
+-- promote themselves by writing profiles.is_admin.
+revoke update on table public.profiles from anon, authenticated;
+grant update (username, display_name, bio, avatar_url) on table public.profiles to authenticated;
+
+-- albums/tracks: public read; writes are restricted to trusted server code
 create policy "albums are readable by everyone"
 on public.albums for select using (true);
-
-create policy "authenticated users can insert albums"
-on public.albums for insert with check (auth.role() = 'authenticated');
-
-create policy "authenticated users can update albums"
-on public.albums for update using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
 
 create policy "tracks are readable by everyone"
 on public.tracks for select using (true);
 
-create policy "authenticated users can insert tracks"
-on public.tracks for insert with check (auth.role() = 'authenticated');
-
-create policy "authenticated users can update tracks"
-on public.tracks for update using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+-- Spotify cache rows are written only by trusted server/service-role code.
+revoke insert, update, delete on table public.albums from anon, authenticated;
+revoke insert, update, delete on table public.tracks from anon, authenticated;
 
 -- reviews policies
 create policy "public reviews are readable"
@@ -259,12 +329,12 @@ using (auth.uid() = user_id or public.is_admin());
 
 -- likes policies
 create policy "likes are readable"
-on public.review_likes for select using (true);
+on public.review_likes for select using (public.can_view_review(review_id));
 
 create policy "users can like as themselves"
 on public.review_likes for insert
 to authenticated
-with check (auth.uid() = user_id);
+with check (auth.uid() = user_id and public.can_view_review(review_id));
 
 create policy "users can unlike as themselves"
 on public.review_likes for delete
@@ -273,12 +343,12 @@ using (auth.uid() = user_id or public.is_admin());
 
 -- comments policies
 create policy "comments are readable"
-on public.review_comments for select using (true);
+on public.review_comments for select using (public.can_view_review(review_id));
 
 create policy "users can comment as themselves"
 on public.review_comments for insert
 to authenticated
-with check (auth.uid() = user_id);
+with check (auth.uid() = user_id and public.can_view_review(review_id));
 
 create policy "users can update own review comments"
 on public.review_comments for update
