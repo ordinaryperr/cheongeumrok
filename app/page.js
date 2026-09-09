@@ -60,7 +60,7 @@ async function getRecentAlbums() {
 
 export default async function Home() {
   const [{ data: reviewData }, { data: albumData }, spotifyArchive, starterAlbums] = await Promise.all([
-    getPublicReviews(),
+    getPublicReviews({ limit: 5 }),
     getRecentAlbums(),
     getSpotifyArchiveCollections(),
     getSpotifyStarterAlbums(),
