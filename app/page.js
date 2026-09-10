@@ -3,6 +3,8 @@ import AppHeader from '../components/AppHeader';
 import AlbumCard from '../components/AlbumCard';
 import ReviewCard from '../components/ReviewCard';
 import IntroVideo from '../components/IntroVideo';
+import EarthIntro from '../components/EarthIntro';
+import IntroJourney from '../components/IntroJourney';
 import { getPublicReviews } from '../lib/reviews';
 import { getSpotifyArchiveCollections, getSpotifyStarterAlbums } from '../lib/spotifyArchive';
 import { supabase } from '../lib/supabase';
@@ -73,7 +75,10 @@ export default async function Home() {
 
   return (
     <main className="homePage simplifiedHome">
-      <IntroVideo />
+      <IntroJourney>
+        <EarthIntro />
+        <IntroVideo />
+      </IntroJourney>
       <AppHeader />
 
       <section className="hero">
